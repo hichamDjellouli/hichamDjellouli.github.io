@@ -1,0 +1,17 @@
+Remarque : Vérifier que votre ordinateur rourne sous le système windows 64bits
+
+1- Après l'installation aller dans le dossier C:\DZental
+2- Lancer l'installation de node-v12.20.1-x64.msi
+3- Lancer l'installation de postgresql-13.0-1-windows-x64.exe
+4- Restaurer la Base de données en cliqueant sur DZental_Delete_Create_Restore_DB.bat (Le fichier dzental_backup.sql sera restauré)
+
+Une fois terminé, lancer l'application start DZental.bat
+utilisateur : demo@dzental.com             Mot de passe : demo
+utilisateur : demo1@dzental.com            Mot de passe : demo1
+utilisateur : demo2@dzental.com            Mot de passe : demo2
+utilisateur : demo3@dzental.com            Mot de passe : demo3
+
+Pour vider la base de données (configuration d'usine) vous veuillez cliquer sur : DZental_Reset_DataBase.bat
+Pour mettre à jour les identifiants (exemple N° patient) après des suppression veuillez cliquer sur : DZental_Reset_IDs.bat
+Les sauvgardes sont programmées chaque semaine, vous trouver le ficher de sauvgardes dans le répertoire : C:\DZental\backups 
+Pour toute information complémentaire, veuillez nous contacter sur notre page facebook : https://fb.me/HDAlgeriaTechnologies
