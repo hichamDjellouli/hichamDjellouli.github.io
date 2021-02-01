@@ -1,0 +1,897 @@
+<!-- Content Wrapper. Contains page content -->
+<div ng-if="logged && user" class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2" style="margin-bottom: -0.5rem!important; ">
+        <div class="col-sm-6" style="margin: 10px;">
+          <h1 class="text-dark" style="font-size: 1.9rem;">Historique de vos sessions</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6 ">
+          <!-- Small boxes (Stat box) -->
+          <div class="row" style="float:right">
+
+            <!--
+            <a ng-click="vm.showHelp=!vm.showHelp" href="" class="btn btn-app" data-toggle="tooltip" data-placement="top"
+              title="Guide de l'application">
+              <i class="fa fa-question-circle"></i> Aide
+            </a>
+          -->
+
+          </div>
+          <!-- /.row -->
+        </div><!-- /.col -->
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+  <!-- /.content-header -->
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+
+      <!-- Main row -->
+      <div class="row">
+        <div class="card card col-sm-12 col-md-12">
+          <div ng-show="vm.showHelp" class="alert alert-warning alert-dismissible"
+            style="max-width: 95%; margin: auto;">
+            <button type="button" class="close" ng-click="vm.showHelp=!vm.showHelp">×</button>
+            <span ng-show="vm.showHelp" class="fnl_help">?</span>
+            <h6 style="margin: auto;">
+              <span class="badge bg-dark ng-binding">1</span> Créer une liste <svg class="bi bi-arrow-right" width="1em"
+                height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd"
+                  d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
+                  clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
+                  clip-rule="evenodd" />
+              </svg> <span class="badge bg-dark ng-binding">2</span> Importer/Traiter les postulants
+              <svg class="bi bi-arrow-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd"
+                  d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
+                  clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
+                  clip-rule="evenodd" />
+              </svg> <span class="badge bg-dark ng-binding">3</span> Valider la liste.
+            </h6>
+
+          </div>
+          <!-- /.card-header -->
+
+          <!-- Main content -->
+          <div class="col-sm-12 col-md-12">
+            </br>
+            <ng-container>
+              <!-- mainTable -->
+              <div class="container rounded">
+                <div class="input-group mb-3" rel="tooltip" title="Rechercher une demande de contrôle"
+                  data-placement="top">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><svg class="bi bi-search" width="1em" height="1em"
+                        viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M10.442 10.442a1 1 0 011.415 0l3.85 3.85a1 1 0 01-1.414 1.415l-3.85-3.85a1 1 0 010-1.415z"
+                          clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                          d="M6.5 12a5.5 5.5 0 100-11 5.5 5.5 0 000 11zM13 6.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
+                          clip-rule="evenodd" />
+                      </svg></span>
+                  </div>
+                  <input type="text" class="form-control" placeholder="Filtre..." ng-model="filterTextMainTable">
+                </div>
+
+
+                <div class="table-responsive tableFixHead" rel="tooltip" data-placement="top"
+                title="Cliquez sur la barre pour visualiser la suite du tableau">
+                <table id="HistoriqueSessionTable" class="table table-striped table-bordered table-hover table-head-fixed text-nowrap"
+                  data-pagination="true" data-side-pagination="server" data-total-field="count" style="text-align: center;">
+                  <thead>
+ 
+                      <tr>
+                        <th ng-repeat="label in labelsMainTable">
+                          <a ng-click="vm.sortColumnMainTable(label)">
+                            <span class="text-uppercase">{{label}}</span>
+                            <span ng-if="orderByFieldMainTable == label">
+                              <span ng-if="!sortByDescendingMainTable">
+                                <i class="fas fa-angle-up"></i>
+                              </span>
+                              <span ng-if="sortByDescendingMainTable">
+                                <i class="fas fa-angle-down"></i>
+                              </span>
+                            </span>
+                          </a>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-click="vm.add2selectionMainTable(HistoriqueSession)"
+                        ng-repeat="HistoriqueSession in dataMainTable = (vm.AllHistoriqueSession | filter: filterTextMainTable | orderBy : orderByFieldMainTable : sortByDescendingMainTable) | limitTo:itemsPerPageMainTable:itemsPerPageMainTable*(currentPageMainTable-1) track by $index"
+                        ng-class="{ 'text-white btn-outline-dark': HistoriqueSession == selected } ">
+
+                        <td>{{HistoriqueSession.id}}</td>
+                        <td>{{HistoriqueSession.hostname}}</td>
+                        <td>{{HistoriqueSession.browser_name}}</td>
+                        <td>{{HistoriqueSession.browser_version}}</td>
+                        <td>{{HistoriqueSession.os_name}}</td>
+                        <td>{{HistoriqueSession.os_version}}</td>
+                        <td>{{HistoriqueSession.date_online | date:'dd-MM-yyyy HH:mm'}}</td>
+                        <td>{{HistoriqueSession.date_exit | date:'dd-MM-yyyy HH:mm'}}</td>
+                        <td>
+                          <i style="color: green;" ng-if="HistoriqueSession.online" class="fa fa-check"> En ligne</i>
+                          <i style="color: red;" ng-if="!HistoriqueSession.online" class="fa fa-times"> Déconnecté</i>
+                        </td>
+                      </tr>
+                    </tbody>
+
+                  </table>
+                </div>
+                <div class="row">
+                  <div class="col-sm-4 col-md-4 col-lg-4">
+                    <p>Total : {{dataMainTable.length}}</p>
+                  </div>
+                  <div class="col-sm-4 col-md-4 col-lg-4"></div>
+                  <div class="col-sm-4 col-md-4 col-lg-4">
+                    <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+                      <label class="btn btn-outline-dark active">
+                        <input type="radio" name="optionsMainTable" id="option1MainTable"
+                          ng-click="itemsPerPageMainTable=10" autocomplete="off"> 10
+                      </label>
+                      <label class="btn btn-outline-dark">
+                        <input type="radio" name="optionsMainTable" id="option2MainTable"
+                          ng-click="itemsPerPageMainTable=20" autocomplete="off"> 20
+                      </label>
+                      <label class="btn btn-outline-dark">
+                        <input type="radio" name="optionsMainTable" id="option5MainTable"
+                          ng-click="itemsPerPageMainTable=50" autocomplete="off">
+                        50
+                      </label>
+                      <label class="btn btn-outline-dark">
+                        <input type="radio" name="optionsMainTable" id="option6MainTable"
+                          ng-click="itemsPerPageMainTable=100" autocomplete="off">
+                        100
+                      </label>
+
+                    </div>
+                  </div>
+                </div>
+                <!-- <ul class="d-flex justify-content-center" uib-pagination previous-text='<<' next-text='>>'
+                  total-items="dataMainTable.length" items-per-page="itemsPerPageMainTable" ng-model="currentPageMainTable"
+                  max- boundary-link-numbers="3" ng-change="vm.pageChangedMainTable()"></ul>
+                -->
+                <ul class="pagination pg-red float-center d-flex justify-content-center"
+                  total-items="dataMainTable.length" ng-model="currentPageMainTable" max-size="maxSizePageMainTable"
+                  boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPageMainTable"
+                  uib-pagination first-text='<<<' previous-text='<<' next-text='>>' last-text='>>>'></ul>
+              </div>
+
+            </ng-container>
+          </div>
+          <!-- END Main content -->
+
+          <!-- /.card-body -->
+        </div>
+      </div>
+      <!-- /.row (main row) -->
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<!--------------------------- ADD LIST POST Modal ---------------------------------------->
+<div class="modal fade show" id="add_HistoriqueSession_modal" style="display: none;" aria-modal="true">
+  <div ng-class="{ 'alert': flash, 'alert-success': flash.type === 'success', 'alert-danger': flash.type === 'error' }"
+    ng-if="flash" ng-bind="flash.message"></div>
+
+  <form name="FormHistoriqueSessionCreate" ng-init="vm.active_tab = 'list'"
+    ng-submit="vm.addHistoriqueSession(FormHistoriqueSessionCreate.$valid,vm.SelectedHistoriqueSession,vm.postulants)"
+    role="form">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-danger">
+          <h4 class="modal-title">Ajouter une nouvelle liste</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="card card-primary card-outline card-outline-tabs">
+            <div class="card-header p-0 border-bottom-0">
+              <ul class="nav nav-tabs" id="custom-tabs-tab" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link" id="custom-tabs-list-tab" data-toggle="tab" href="" role="tab"
+                    aria-controls="custom-tabs-list" aria-selected="{vm.active_tab==='list'}"
+                    ng-class="{'active': vm.active_tab==='list'}" ng-click="vm.active_tab = 'list'">
+                    <span class="badge bg-success">1</span> Liste</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" id="custom-tabs-post-tab" data-toggle="tab" href="" role="tab"
+                    aria-controls="custom-tabs-post" aria-selected="{vm.active_tab==='post'}"
+                    ng-class="{'disabled': vm.active_tab!=='post', 'active': vm.active_tab==='post'}"
+                    ng-click="vm.active_tab = 'post'">
+                    <span class="badge bg-danger">2</span> Postulants</a>
+                </li>
+              </ul>
+            </div>
+            <div class="card-body">
+              <div class="tab-content" id="custom-tabs-tabContent">
+                <div class="tab-pane fade" id="custom-tabs-list" role="tabpanel" aria-labelledby="custom-tabs-list-tab"
+                  ng-class="{'active':vm.active_tab==='list','show':vm.active_tab==='list'}">
+
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <div class="form-group">
+                        <label>Wilaya</label>
+                        <select class="form-control" name="FormHistoriqueSessionCreateDirection"
+                          ng-model="vm.SelectedHistoriqueSession.wilaya_id" required>
+                          <option value=""></option>
+                          <option ng-repeat="wilaya in wilayas" value="{{wilaya.id}}">
+                            {{wilaya.designation}}
+                          </option>
+                        </select>
+                        <span style="color:red"
+                          ng-if="FormHistoriqueSessionCreate.FormHistoriqueSessionCreateDirection.$dirty && FormHistoriqueSessionCreate.FormHistoriqueSessionCreateDirection.$error.required"
+                          class="help-block">Attention : la wilaya est obligatoire</span>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <!-- select -->
+                      <div class="form-group">
+                        <label>Produit</label>
+                        <select class="form-control" name="FormHistoriqueSessionCreateProduit"
+                          ng-model="vm.SelectedHistoriqueSession.produit_id" required>
+                          <option value=""></option>
+                          <option ng-repeat="produit in produits" value="{{produit.id}}">
+                            {{produit.designation}}
+                          </option>
+                        </select>
+                        <span style="color:red"
+                          ng-if="FormHistoriqueSessionCreate.FormHistoriqueSessionCreateProduit.$dirty && FormHistoriqueSessionCreate.FormHistoriqueSessionCreateProduit.$error.required"
+                          class="help-block">Attention : le produit est obligatoire</span>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <!-- select -->
+                      <div class="form-group">
+                        <label>Programme</label>
+                        <select class="form-control" name="FormHistoriqueSessionCreateProgramme"
+                          ng-model="vm.SelectedHistoriqueSession.programme_id" required>
+                          <option value=""></option>
+                          <option ng-repeat="programme in programmes" value="{{programme.id}}">
+                            {{programme.designation}}
+                          </option>
+                        </select>
+                        <span style="color:red"
+                          ng-if="FormHistoriqueSessionCreate.FormHistoriqueSessionCreateProgramme.$dirty && FormHistoriqueSessionCreate.FormHistoriqueSessionCreateProgramme.$error.required"
+                          class="help-block">Attention : le programme est obligatoire</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <!-- text input -->
+                      <div class="form-group">
+                        <label>Référence</label>
+                        <input type="text" ng-model="vm.SelectedHistoriqueSession.ref_local" class="form-control"
+                          placeholder="Enter ..." name="FormHistoriqueSessionCreateReference" required>
+                        <span style="color:red"
+                          ng-if="FormHistoriqueSessionCreate.FormHistoriqueSessionCreateReference.$dirty && FormHistoriqueSessionCreate.FormHistoriqueSessionCreateReference.$error.required"
+                          class="help-block">Attention : la référence est obligatoire</span>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="form-group">
+                        <label>Date demande</label>
+                        <div class="input-group">
+                          <input type="text" class="form-control maskeddate" id="FormHistoriqueSessionCreateDateDemande"
+                            name="date_demande_edit" title="Date demande" data-toggle="tooltip"
+                            ng-model="vm.SelectedHistoriqueSession.date_demande" placeholder="dd/MM/yyyy"
+                            pattern="(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d" required />
+
+                        </div>
+                        <span style="color:red"
+                          ng-if="FormHistoriqueSessionCreate.FormHistoriqueSessionCreateDateDemande.$dirty && FormHistoriqueSessionCreate.FormHistoriqueSessionCreateDateDemande.$error.required"
+                          class="help-block">Attention : la date demande est obligatoire</span>
+                        <!-- /.input group -->
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6">
+
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <!-- checkbox -->
+                      <div class="form-group">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" ng-model="vm.SelectedHistoriqueSession.active"
+                            name="FormHistoriqueSessionCreateActive" required>
+                          <label class="form-check-label">Active ?</label>
+                          <span style="color:red"
+                            ng-if="FormHistoriqueSessionCreate.FormHistoriqueSessionCreateActive.$dirty && FormHistoriqueSessionCreate.FormHistoriqueSessionCreateActive.$error.required"
+                            class="help-block">Attention : le champ active est obligatoire</span>
+                        </div>
+                      </div>
+                      <div class="col-sm-6">
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <div class="tab-pane fade" id="custom-tabs-post" role="tabpanel" aria-labelledby="custom-tabs-post-tab"
+                  ng-class="{'active':vm.active_tab==='post','show':vm.active_tab==='post'}">
+                  <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+
+                      <div ng-if="vm.postulants.length==0" class="form-group" style="cursor: pointer;">
+                        <label for="add_post_file">Chargement de la liste des postulants</label>
+                        <div class="input-group">
+                          <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="add_post_file">
+                            <label class="custom-file-label" for="add_post_file">Choisir le fichier</label>
+                          </div>
+                          <div ng-click="vm.ReadExcelData('#add_post_file')" class="input-group-append">
+                            <span class="input-group-text" id="">Charger le fichier</span>
+                          </div>
+                        </div>
+                      </div>
+
+
+                      <ng-container ng-if="vm.postulants.length > 0">
+                        <!-- TABLES, FILTERING, AND PAGINATION -->
+                        <div class="container rounded">
+                          <input type="text" class="form-control my-3" placeholder="Filtre..."
+                            ng-model="filterTextPostulantTableCreate">
+                          <div class="table-responsive tableFixHead" vm.controlled>
+                            <table id="HistoriqueSessionTable"
+                              class="table table-striped table-bordered table-hover table-head-fixed text-nowrap"
+                              data-pagination="true" data-side-pagination="server" data-total-field="count"
+                              style="text-align: center;">
+                              <thead>
+                                <tr>
+                                  <th ng-repeat="label in labelsPostulantsTableCreate">
+                                    <a ng-click="vm.sortColumnPostulantsTableCreate(label)">
+                                      <span class="text-uppercase">{{label}}</span>
+                                      <span ng-if="orderByFieldPostulantsTableCreate == label">
+                                        <span ng-if="!sortByDescendingPostulantsTableCreate">
+                                          <i class="fas fa-angle-up"></i>
+                                        </span>
+                                        <span ng-if="sortByDescendingPostulantsTableCreate">
+                                          <i class="fas fa-angle-down"></i>
+                                        </span>
+                                      </span>
+                                    </a>
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-click="vm.add2selectionPostulantsTableCreate(post)"
+                                  ng-repeat="post in dataPostulantsTableCreate = (vm.postulants | filter: filterTextPostulantTableCreate | orderBy : orderByFieldPostulantsTableCreate : sortByDescendingPostulantsTableCreate) | limitTo:itemsPerPagePostulantsTableCreate:itemsPerPagePostulantsTableCreate*(currentPagePostulantsTableCreate-1) track by $index"
+                                  ng-class="{ 'text-white btn-outline-dark': post == selected } ">
+                                  <td>
+                                    <select class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      name="FormHistoriqueSessionCreateProduit{{$index}}"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateProduit{{$index}}.$invalid }"
+                                      ng-model="post.produit_id" required>
+                                      <option value=""></option>
+                                      <option ng-repeat="prod in produits" value="{{prod.id}}">
+                                        {{prod.designation}}
+                                      </option>
+                                    </select>
+                                  </td>
+                                  <td>
+                                    <input class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateNum{{$index}}.$invalid }"
+                                      type="text" id="FormHistoriqueSessionCreateNum{{$index}}"
+                                      name="FormHistoriqueSessionCreateNum{{$index}}" ng-model="post.num"
+                                      pattern="^[0-9]*$" oninput="this.setCustomValidity('')"
+                                      oninvalid="this.setCustomValidity('Le numéro d\'ordre est de type numéric')"
+                                      placeholder="num ..." required>
+                                  </td>
+                                  <td>
+                                    <input class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateNin{{$index}}.$invalid }"
+                                      type="text" id="FormHistoriqueSessionCreateNin{{$index}}"
+                                      name="FormHistoriqueSessionCreateNin{{$index}}" ng-model="post.nin"
+                                      pattern="\d{18}" oninput="this.setCustomValidity('')"
+                                      oninvalid="this.setCustomValidity('Le numéro d\'identification national, est un numéro porté sur 18 positions')"
+                                      placeholder="NIN ..." required>
+                                  </td>
+                                  <td>
+                                    <input class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateNom{{$index}}.$invalid }"
+                                      type="text" name="FormHistoriqueSessionCreateNom{{$index}}" ng-model="post.nom"
+                                      minlength="2" pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$"
+                                      placeholder="Nom ..." required>
+                                  </td>
+                                  <td>
+                                    <input class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateNJF{{$index}}.$invalid }"
+                                      type="text" name="FormHistoriqueSessionCreateNJF{{$index}}"
+                                      ng-model="post.nom_jeune_fille" placeholder="NJF ...">
+                                  </td>
+                                  <td>
+                                    <input class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;" type="text"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreatePrenom{{$index}}.$invalid }"
+                                      name="FormHistoriqueSessionCreatePrenom{{$index}}" ng-model="post.prenom"
+                                      minlength="2" pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$"
+                                      placeholder="Enter ..." required>
+                                  </td>
+                                  <td>
+                                    <select class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      name="FormHistoriqueSessionCreateSexe{{$index}}"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateSexe{{$index}}.$invalid }"
+                                      ng-model="post.sexe" required>
+                                      <option value=""></option>
+                                      <option ng-repeat="sexe in sexes" value="{{sexe.id}}">
+                                        {{sexe.designation}}
+                                      </option>
+                                    </select>
+                                  </td>
+                                  <td>
+                                    <input class="form-control maskeddate"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;" type="text"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateDate_naiss{{$index}}.$invalid }"
+                                      name="FormHistoriqueSessionCreateDate_naiss{{post.num}}"
+                                      ng-model="post.date_naiss" placeholder="dd/MM/yyyy"
+                                      pattern="(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d"
+                                      required />
+                                  </td>
+                                  <td>
+                                    <select class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      name="FormHistoriqueSessionCreateTDN{{$index}}"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateTDN{{$index}}.$invalid }"
+                                      ng-model="post.type_date_naiss" required>
+                                      <option value=""></option>
+                                      <option ng-repeat="tdn in types_date_naiss" value="{{tdn.id}}">
+                                        {{tdn.designation}}
+                                      </option>
+                                    </select>
+                                  </td>
+                                  <td>
+                                    <input class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;" type="text"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateLieuNaiss{{$index}}.$invalid }"
+                                      name="FormHistoriqueSessionCreateLieuNaiss{{$index}}" ng-model="post.lieu_naiss"
+                                      minlength="2" placeholder="Enter ..." required>
+                                  </td>
+                                  <td>
+                                    <select class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      name="FormHistoriqueSessionCreateSTF{{$index}}"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateSTF{{$index}}.$invalid }"
+                                      ng-model="post.situation_familiale" required>
+                                      <option value=""></option>
+                                      <option ng-repeat="sitf in situations_familiales" value="{{sitf.id}}">
+                                        {{sitf.designation}}
+                                      </option>
+                                    </select>
+                                  </td>
+                                  <td>
+                                    <input class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreatePpere{{$index}}.$invalid }"
+                                      type="text" name="FormHistoriqueSessionCreatePpere{{$index}}"
+                                      ng-model="post.ppere" minlength="2"
+                                      pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$" placeholder="Prénom père ..."
+                                      required>
+                                  </td>
+                                  <td>
+                                    <input class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateNmere{{$index}}.$invalid }"
+                                      type="text" name="FormHistoriqueSessionCreateNmere{{$index}}"
+                                      ng-model="post.nmere" minlength="2"
+                                      pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$" placeholder="Nom mère ..."
+                                      required>
+                                  </td>
+                                  <td>
+                                    <input class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreatePmere{{$index}}.$invalid }"
+                                      type="text" name="FormHistoriqueSessionCreatePmere{{$index}}"
+                                      ng-model="post.pmere" minlength="2"
+                                      pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$" placeholder="Prénom mère ..."
+                                      required>
+                                  </td>
+                                  <td>
+                                    <input ng-if="post.situation_familiale==='M'" class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateNin_cjt{{$index}}.$invalid }"
+                                      type="text" name="FormHistoriqueSessionCreateNin_cjt{{$index}}"
+                                      ng-model="post.nin_cjt" pattern="\d{18}" oninput="this.setCustomValidity('')"
+                                      oninvalid="this.setCustomValidity('Le numéro d\'identification national, est un numéro porté sur 18 positions')"
+                                      placeholder="NIN ..." required>
+                                  </td>
+                                  <td>
+                                    <input ng-if="post.situation_familiale==='M'" class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateNomnom_cjt{{$index}}.$invalid }"
+                                      type="text" name="FormHistoriqueSessionCreateNomnom_cjt{{$index}}"
+                                      ng-model="post.nom_cjt" minlength="2"
+                                      pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$" placeholder="Nom ..." required>
+                                  </td>
+                                  <td>
+                                    <input ng-if="post.situation_familiale==='M'" class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateNJF_cjt{{$index}}.$invalid }"
+                                      type="text" name="FormHistoriqueSessionCreateNJF_cjt{{$index}}"
+                                      ng-model="post.nom_jeune_fille_cjt" placeholder="NJF ...">
+
+                                  </td>
+                                  <td>
+                                    <input ng-if="post.situation_familiale==='M'" class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;" type="text"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreatePrenom_cjt{{$index}}.$invalid }"
+                                      name="FormHistoriqueSessionCreatePrenom_cjt{{$index}}" ng-model="post.prenom_cjt"
+                                      minlength="2" pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$"
+                                      placeholder="Enter ..." required>
+
+                                  </td>
+                                  <td>
+                                    <input ng-if="post.situation_familiale==='M'" class="form-control maskeddate"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;" type="text"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateDate_naiss_cjt{{$index}}.$invalid }"
+                                      name="FormHistoriqueSessionCreateDate_naiss_cjt{{post.num}}"
+                                      ng-model="post.date_naiss_cjt" placeholder="dd/MM/yyyy"
+                                      pattern="(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d"
+                                      required />
+                                  </td>
+                                  <td>
+                                    <select ng-if="post.situation_familiale==='M'" class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      name="FormHistoriqueSessionCreateTDN_cjt{{$index}}"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateTDN_cjt{{$index}}.$invalid }"
+                                      ng-model="post.type_date_naiss_cjt" required>
+                                      <option value=""></option>
+                                      <option ng-repeat="tdn in types_date_naiss" value="{{tdn.id}}">
+                                        {{tdn.designation}}
+                                      </option>
+                                    </select></td>
+                                  <td>
+                                    <input ng-if="post.situation_familiale==='M'" class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;" type="text"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateLieuNaiss_cjt{{$index}}.$invalid }"
+                                      name="FormHistoriqueSessionCreateLieuNaiss_cjt{{$index}}"
+                                      ng-model="post.lieu_naiss_cjt" minlength="2" placeholder="Enter ..." required>
+                                  </td>
+                                  <td>
+                                    <input ng-if="post.situation_familiale==='M'" class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreatePpere_cjt{{$index}}.$invalid }"
+                                      type="text" name="FormHistoriqueSessionCreatePpere_cjt{{$index}}"
+                                      ng-model="post.ppere_cjt" minlength="2"
+                                      pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$" placeholder="Prénom père ..."
+                                      required>
+                                  </td>
+                                  <td>
+                                    <input ng-if="post.situation_familiale==='M'" class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreateNmere_cjt{{$index}}.$invalid }"
+                                      type="text" name="FormHistoriqueSessionCreateNmere_cjt{{$index}}"
+                                      ng-model="post.nmere_cjt" minlength="2"
+                                      pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$" placeholder="Nom mère ..."
+                                      required>
+                                  </td>
+                                  <td>
+                                    <input ng-if="post.situation_familiale==='M'" class="form-control"
+                                      style="width: auto; height: auto; margin: auto;padding: auto;"
+                                      ng-class="{ 'is-invalid' : FormHistoriqueSessionCreate.FormHistoriqueSessionCreatePmere_cjt{{$index}}.$invalid }"
+                                      type="text" name="FormHistoriqueSessionCreatePmere_cjt{{$index}}"
+                                      ng-model="post.pmere_cjt" minlength="2"
+                                      pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$" placeholder="Prénom mère ..."
+                                      required>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          <!--
+                          <div class="row">
+                            <div class="col-sm-4 col-md-4 col-lg-4">
+                              {{selected_lignesPostulantsTableCreate}} Ligne(s) selectionnée(s)
+                            </div>
+                            <div class="col-sm-4 col-md-4 col-lg-4"></div>
+                            <div class="col-sm-4 col-md-4 col-lg-4">
+                              <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+                                <label class="btn btn-outline-dark ">
+                                  <input type="radio" name="optionsPostulantsTableCreate"
+                                    id="option1PostulantsTableCreate" ng-click="itemsPerPagePostulantsTableCreate=3"
+                                    autocomplete="off"> 3
+                                </label>
+                                <label class="btn btn-outline-dark">
+                                  <input type="radio" name="optionsPostulantsTableCreate"
+                                    id="option2PostulantsTableCreate" ng-click="itemsPerPagePostulantsTableCreate=5"
+                                    autocomplete="off"> 5
+                                </label>
+                                <label class="btn btn-outline-dark active">
+                                  <input type="radio" name="optionsPostulantsTableCreate"
+                                    id="option3PostulantsTableCreate" ng-click="itemsPerPagePostulantsTableCreate=10"
+                                    autocomplete="off" checked=""> 10
+                                </label>
+                                <label class="btn btn-outline-dark">
+                                  <input type="radio" name="optionsPostulantsTableCreate"
+                                    id="option4PostulantsTableCreate" ng-click="itemsPerPagePostulantsTableCreate=20"
+                                    autocomplete="off">
+                                  20
+                                </label>
+                                <label class="btn btn-outline-dark">
+                                  <input type="radio" name="optionsPostulantsTableCreate"
+                                    id="option5PostulantsTableCreate" ng-click="itemsPerPagePostulantsTableCreate=50"
+                                    autocomplete="off">
+                                  50
+                                </label>
+                                <label class="btn btn-outline-dark">
+                                  <input type="radio" name="optionsPostulantsTableCreate"
+                                    id="option6PostulantsTableCreate" ng-click="itemsPerPagePostulantsTableCreate=100"
+                                    autocomplete="off">
+                                  100
+                                </label>
+
+                              </div>
+
+                            </div>
+                          </div>
+
+                          <ul class="d-flex justify-content-center" total-items="dataPostulantsTableCreate.length"
+                            ng-model="currentPagePostulantsTableCreate" max-size="maxSizePagePostulantsTableCreate"
+                            class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages"
+                            items-per-page="itemsPerPagePostulantsTableCreate" uib-pagination first-text='<<<'
+                            previous-text='<<' next-text='>>' last-text='>>>'></ul>
+                        -->
+
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /.card -->
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-danger" ng-click="vm.closeModal()">Fermer</button>
+          <button type="submit" class="btn btn-success">{{vm.modal_action}}</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </form>
+</div>
+
+<!---------------------------Scripts--------------------------------------------->
+<script type="text/javascript">
+  $(document).ready(function () {
+    //$('[data-toggle="tooltip"]').tooltip(); //ne marche pas en cas dappel a un modal
+    $('[rel="tooltip"]').tooltip({
+      trigger: "hover"
+    });
+
+    //File upload 
+    bsCustomFileInput.init();
+
+    //Annimations
+    $("#guide").fadeIn(30000);
+
+    $('.table-responsive').doubleScroll({
+      resetOnWindowResize: true
+    });
+
+    $('#EditHistoriqueSessionTable').doubleScroll({
+      resetOnWindowResize: true
+    });
+
+
+
+    //Masks
+    $(".maskeddate").inputmask("99/99/9999", {
+      "clearIncomplete": true,
+      "onincomplete": function () {
+        //alert('Veuillez compléter la saisie de la date');
+      }
+    });
+
+    /*
+        $('#edit_Post_modal').on('shown.bs.modal', function (e) {
+          console.log("1 ");
+          $('#edit_Post_modal').hide().show(0);
+        });
+
+        var originalModal = $('#edit_Post_modal').clone();
+        $('#edit_Post_modal').on('hidden.bs.modal', function (e) {
+          console.log("1 " + $('#edit_Post_modal').innerHTML);
+
+          $('#edit_Post_modal').empty();
+          console.log("2 " + $('#edit_Post_modal').innerHTML);
+
+          var myClone = originalModal.clone();
+          $('body').append(myClone);
+          console.log("3 " + $('#edit_Post_modal').innerHTML);
+
+        });
+
+
+        $('.modal').on('shown.bs.modal', function (e) {
+          alert('Openin modal');
+          var container = $("#edit_Post_modal");
+          var content = container.innerHTML;
+          container.innerHTML.remove();
+
+          container.innerHTML = content;
+
+          //this line is to watch the result in console , you can remove it later	
+          console.log("Refreshed");
+        });
+
+        $('.modal').on('hidden.bs.modal', function (e) {
+          $(this).find('form').trigger('reset');
+          alert('Cleaning modal');
+        });
+    */
+  });
+  $(function () {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000
+    });
+
+    $('.swalDefaultSuccess').click(function () {
+      Toast.fire({
+        icon: 'success',
+        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.swalDefaultInfo').click(function () {
+      Toast.fire({
+        icon: 'info',
+        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.swalDefaultError').click(function () {
+      Toast.fire({
+        icon: 'error',
+        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.swalDefaultWarning').click(function () {
+      Toast.fire({
+        icon: 'warning',
+        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.swalDefaultQuestion').click(function () {
+      Toast.fire({
+        icon: 'question',
+        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+
+    $('.toastrDefaultSuccess').click(function () {
+      toastr.success('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
+    });
+    $('.toastrDefaultInfo').click(function () {
+      toastr.info('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
+    });
+    $('.toastrDefaultError').click(function () {
+      toastr.error('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
+    });
+    $('.toastrDefaultWarning').click(function () {
+      toastr.warning('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
+    });
+
+    $('.toastsDefaultDefault').click(function () {
+      $(document).Toasts('create', {
+        title: 'Toast Title',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultTopLeft').click(function () {
+      $(document).Toasts('create', {
+        title: 'Toast Title',
+        position: 'topLeft',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultBottomRight').click(function () {
+      $(document).Toasts('create', {
+        title: 'Toast Title',
+        position: 'bottomRight',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultBottomLeft').click(function () {
+      $(document).Toasts('create', {
+        title: 'Toast Title',
+        position: 'bottomLeft',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultAutohide').click(function () {
+      $(document).Toasts('create', {
+        title: 'Toast Title',
+        autohide: true,
+        delay: 750,
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultNotFixed').click(function () {
+      $(document).Toasts('create', {
+        title: 'Toast Title',
+        fixed: false,
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultFull').click(function () {
+      $(document).Toasts('create', {
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        icon: 'fas fa-envelope fa-lg',
+      })
+    });
+    $('.toastsDefaultFullImage').click(function () {
+      $(document).Toasts('create', {
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        image: '../../dist/img/HistoriqueSession3-128x128.jpg',
+        imageAlt: 'HistoriqueSession Picture',
+      })
+    });
+    $('.toastsDefaultSuccess').click(function () {
+      $(document).Toasts('create', {
+        class: 'bg-success',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultInfo').click(function () {
+      $(document).Toasts('create', {
+        class: 'btn-outline-dark',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultWarning').click(function () {
+      $(document).Toasts('create', {
+        class: 'bg-warning',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultDanger').click(function () {
+      $(document).Toasts('create', {
+        class: 'bg-danger',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultMaroon').click(function () {
+      $(document).Toasts('create', {
+        class: 'bg-maroon',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+  });
+</script>

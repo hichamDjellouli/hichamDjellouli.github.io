@@ -1,0 +1,51 @@
+{
+  "name": "api_fv3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tap test/**/*.test.js",
+    "start": "fastify start -l info app.js --address  0.0.0.0 --port 3000",
+    "dev": "fastify start -w -l info -P app.js --address 0.0.0.0 --port 3000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cron": "^1.8.2",
+    "dateformat": "^4.5.0",
+    "detect-browser": "^5.2.0",
+    "fastify": "^3.7.0",
+    "fastify-autoload": "^3.3.0",
+    "fastify-cli": "^2.5.1",
+    "fastify-cors": "^4.1.0",
+    "fastify-helmet": "^5.0.3",
+    "fastify-http-proxy": "^4.0.4",
+    "fastify-jwt": "^2.1.3",
+    "fastify-multer": "^2.0.2",
+    "fastify-nodemailer": "^5.0.0",
+    "fastify-plugin": "^3.0.0",
+    "fastify-postgres": "^3.1.0",
+    "fastify-static": "^3.3.0",
+    "fastify-url-data": "^3.0.3",
+    "fs": "0.0.1-security",
+    "geoip-lite": "^1.4.2",
+    "getmac": "^5.17.0",
+    "pg": "^8.4.2",
+    "pino": "^6.7.0",
+    "request-ip": "^2.1.3",
+    "sniffr": "^1.2.0",
+    "systeminformation": "^4.29.0"
+  },
+  "devDependencies": {
+    "cryptolens": "^1.0.2",
+    "javascript-obfuscator": "^2.10.3",
+    "tap": "^14.0.0"
+  },
+  "optionalDependencies": {
+    "fsevents": "^2.2.1"
+  }
+}

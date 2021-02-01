@@ -1,0 +1,129 @@
+<!--
+<div class="ribbon-wrapper ribbon-lg" style="margin-top:0">
+    <div id="red_band" class="ribbon bg-danger text-xxl">
+    </div>
+    <img src="dist/img/beta.png" alt="beta_version" style="height:68px;margin-top: 15px;
+    margin-left: 15px;" />
+</div>
+-->
+
+<!--
+    style="
+margin-top: 3%;position: absolute;
+top: 50%;
+left: 50%;
+width: 500px;
+height: 500px;
+/*margin-top: -250px;  Half the height */
+margin-left: -250px;/* Half the width */
+"
+-->
+<table id="myGrid" style=" height:100%;width: 100%;padding: 0;border: 0;">
+    <tr>
+        <td style="width: 29%;"></td>
+        <td style=" width: 42%; vertical-align: middle; padding-top: 5%;">
+            <div class="login-box" style="width: 100%;color: #6bb1e6;">
+                <div class="login-logo">
+                    <h1 id="auth">Authentification</h1>
+                </div>
+                <div class="card"
+                    style="width: 80%; margin-right: auto;margin-left: auto;background-color: #c4ceff;opacity: 90%;">
+                    <img class="brand-image " alt="Dzental"
+                        style="max-width: 265px;margin: auto;vertical-align: middle;"
+                        src="/app-content/img/Dzental_logo.png">
+                    <hr style="width: 50%; color: black;margin: auto;">
+                    <div class="card-body login-card-body" style="margin: auto;width:100%;background-color: #fffffff7;">
+
+                        <div ng-if="!testhttpOK" class="alert-danger">Votre connexion au serveur a été interrompue</div>
+
+                        <div ng-class="{ 'alert': flash, 'alert-success': flash.type === 'success', 'alert-danger': flash.type === 'error' }"
+                            ng-if="flash" ng-bind="flash.message"></div>
+                        <form name="form" ng-submit="vm.login()" role="form">
+                            <span ng-if="form.email.$dirty && form.email.$error.required" class="help-block">L'email est
+                                obligatoire</span>
+                            <div class="input-group mb-3"
+                                ng-class="{ 'has-error': form.email.$dirty && form.email.$error.required }">
+                                <input type="email" class="form-control" placeholder="Email" name="email" id="email"
+                                    ng-model="vm.email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required />
+                                <div class="input-group-append">
+                                    <div class="input-group-text">
+                                        <span class="fas fa-envelope"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <span ng-if="form.password.$dirty && form.password.$error.required" class="help-block">Mot
+                                de
+                                passe est obligatoire</span>
+                            <div class="input-group mb-3"
+                                ng-class="{ 'has-error': form.password.$dirty && form.password.$error.required }">
+                                <input type="password" name="password" autocomplete="votre mot de passe"
+                                    placeholder="Mot de passe" id="password" class="form-control" ng-model="vm.password"
+                                    required />
+                                <div class="input-group-append">
+                                    <div class="input-group-text">
+                                        <span class="fas fa-lock"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top: 30px;">
+                                <div class="col-6">
+                                    <p class="mb-1">
+                                        <a href="#!/forgot_password" style="font-size: 14px;">Mot de passe oublié</a>
+                                        <hr style="margin: auto;">
+                                        <!--   <a href="#!/register" class="text-center"
+                                            style="font-size: 14px;">Inscrivez-Vous!</a>-->
+                                    </p>
+                                    <!--   <div class="icheck-primary">
+                                            <input type="checkbox" id="remember">
+                                            <label for="remember">
+                                                Rester connecter
+                                            </label>
+                                        </div>  /.col -->
+                                </div>
+
+                                <div class="col-6">
+                                    <button type="submit" ng-disabled="form.$invalid || vm.dataLoading"
+                                        class="btn btn-primary btn-block">Se connecter</button>
+                                    <img ng-if="vm.dataLoading" alt="FNL"
+                                        src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                                </div>
+                                <!-- /.col -->
+                            </div>
+                        </form>
+
+                    </div>
+                    <!-- /.login-card-body -->
+                </div>
+
+                <div id="welcome" style="color:#c4ceff;font-size: 16px;margin: auto;width: 480px;"></div>
+                <p class="text-center"><a href="https://fb.me/HDAlgeriaTechnologies">HD Technologies</a>
+                    <a href="https://m.me/HDAlgeriaTechnologies">
+                        <img src="../app-content/img/messenger.png" alt="background" class="brand-image"
+                            style="max-width : 25px;max-height:25px;opacity: .8">
+                    </a>
+
+                </p>
+                 <!--
+                <div ng-if="!logged" class="row">
+                    <img class="brand-image " alt="FNL" style="height:30px;vertical-align: middle;margin:auto;"
+                        src="/app-content/img/logo_cnl_h.png">
+                </div>
+            -->
+            </div>
+        </td>
+        <td style="width: 29%;"></td>
+    </tr>
+</table>
+
+
+
+
+<script>
+    $(function () {
+        $('#welcome')
+            .typetype("Bienvenue dans l'application Dzental, votre secret de réussite")
+            .delay(1500)
+    })
+</script>

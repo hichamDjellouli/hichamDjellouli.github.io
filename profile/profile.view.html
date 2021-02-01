@@ -1,0 +1,169 @@
+ <div ng-if="logged && user" class="content-wrapper">
+     <!-- Content Header (Page header) -->
+     <div class="content-header">
+         <div class="container-fluid">
+             <div class="row mb-2" style="margin-bottom: -0.5rem!important; ">
+                 <div class="col-sm-6" style="margin: auto;">
+                     <h1 class="text-dark" style="font-size: 2.8rem;">Paramètres du profil</h1>
+                 </div><!-- /.col -->
+                 <div class="col-sm-6 ">
+
+                 </div>
+                 <!-- /.row -->
+             </div><!-- /.col -->
+         </div><!-- /.row -->
+     </div><!-- /.container-fluid -->
+
+     <!-- Main content -->
+     <section class="content">
+         <div class="container-fluid">
+             <div class="card">
+                 <div class="card-body profile-card-body">
+                     <div ng-class="{ 'alert': flash, 'alert-success': flash.type === 'success', 'alert-danger': flash.type === 'error' }"
+                         ng-if="flash" ng-bind="flash.message"></div>
+                     <form name="form_profile" ng-submit="vm.profile(form_profile.$valid)" role="form">
+
+                         <div class="custom-control custom-switch" style="float:right"
+                             ng-class="{'custom-switch-off-success':user.active,'custom-switch-off-danger':!user.active }">
+                             <input type="checkbox" class="custom-control-input" ng-checked="user.active">
+                             <label class="custom-control-label">Etat du compte</label>
+                         </div>
+                         <div class="row">
+                             <div class="col-sm-4">
+                                 <!-- select -->
+                                 <div class="form-group">
+                                     <label>Organisme</label>
+                                     <select class="form-control" name="organisme_profile" ng-model="user.org_id"
+                                         ng-options="org.id as org.designation for org in orgs" required>
+                                         <option value=""></option>
+                                     </select>
+                                 </div>
+                             </div>
+                             <div class="col-sm-4">
+                                 <div class="form-group">
+                                     <label>Direction</label>
+                                     <select class="form-control" name="direction_profile"
+                                         ng-model="user.org_directions_id"
+                                         ng-options="org_dir.id as org_dir.designation for org_dir in org_directions"
+                                         required>
+                                         <option value=""></option>
+                                     </select>
+                                 </div>
+                             </div>
+
+                             <div class="col-sm-4">
+                                 <div class="form-group">
+                                     <label>Wilayas</label>
+                                     <select class="form-control" name="wilaya_profile" ng-model="user.wilaya_id"
+                                         ng-options="wilaya.id as wilaya.designation for wilaya in wilayas" required>
+                                         <option value=""></option>
+                                     </select>
+                                 </div>
+                             </div>
+                         </div>
+
+                         <div class="row">
+                             <div class="form-group">
+                                 <label>Civilité : </label>
+
+                                 <div class="form-check form-check-inline">
+                                     <input class="form-check-input" type="radio" ng-model="user.gender"
+                                         name="civilite_profile" value="M" required>
+                                     <label class="form-check-label">Monsieur</label>
+                                 </div>
+                                 <div class="form-check form-check-inline">
+                                     <input class="form-check-input" type="radio" ng-model="user.gender"
+                                         name="civilite_profile" value="F" required>
+                                     <label class="form-check-label">Madame</label>
+                                 </div>
+                             </div>
+
+                         </div>
+
+                         <div class="row">
+                             <div class="col-sm-6">
+                                 <!-- text input -->
+                                 <div class="form-group">
+                                     <label>Nom</label>
+                                     <input type="text" ng-model="user.fname" class="form-control"
+                                         placeholder="Enter ..." name="nom_profile" required>
+                                 </div>
+                             </div>
+                             <div class="col-sm-6">
+                                 <div class="form-group">
+                                     <label>Prénom</label>
+                                     <input type="text" ng-model="user.lname" class="form-control"
+                                         placeholder="Enter ..." name="prenom_profile" required>
+                                 </div>
+                             </div>
+                         </div>
+
+                         <div class="row">
+                             <div class="col-sm-4">
+                                 <div class="input-group "
+                                     ng-class="{ 'has-error': form_profile.email_profile.$dirty && form_profile.email_profile.$error.required }">
+                                     <input type="email" class="form-control" placeholder="Email" name="email_profile"
+                                         id="email_profile" ng-model="user.email"
+                                         pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required />
+                                     <div class="input-group-append">
+                                         <div class="input-group-text">
+                                             <span class="fas fa-envelope"></span>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
+                             <div class="col-sm-4">
+                                 <div class="input-group"
+                                     ng-class="{ 'has-error': form_profile.password.$dirty && form_profile.password_profile.$error.required }">
+                                     <input type="password" name="password_profile" autocomplete="votre mot de passe" placeholder="Mot de passe"
+                                         id="password_profile" class="form-control" ng-model="user.password"
+                                         minlength="5" ng-change="vm.validatePassword()" required />
+                                     <div class="input-group-append">
+                                         <div class="input-group-text">
+                                             <span class="fas fa-lock"></span>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
+                             <div class="col-sm-4">
+
+                                 <div class="input-group"
+                                     ng-class="{ 'has-error': form_profile.repassword_profile.$dirty && form_profile.repassword_profile.$error.required }">
+                                     <input type="password" name="repassword_profile" autocomplete="votre mot de passe"
+                                         placeholder="retapez votre Mot de passe" id="repassword_profile"
+                                         class="form-control" ng-model="user.repassword"
+                                         ng-keyup="vm.validatePassword()" minlength="5" required />
+                                     <div class="input-group-append">
+                                         <div class="input-group-text">
+                                             <span class="fas fa-lock"></span>
+                                         </div>
+                                     </div>
+                                     <p ng-if="user.password != user.repassword" style="color:red">Les deux mots
+                                         de
+                                         passes
+                                         ne
+                                         sont pas
+                                         identiques</p>
+                                 </div>
+                             </div>
+
+                         </div>
+                         </br>
+                         <div class="row">
+                             <div class="col-12">
+                                 <button type="submit" class="btn btn-success btn-block">Mettre à jour mon
+                                     profile</button>
+                                 <img ng-if="vm.dataLoading"
+                                     src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                             </div>
+                             <!-- /.col -->
+                         </div>
+                     </form>
+
+                 </div>
+                 <!-- /.profile-card-body -->
+             </div>
+         </div>
+         <!-- /.profile-box -->
+     </section>
+ </div>

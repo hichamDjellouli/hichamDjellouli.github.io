@@ -1,0 +1,915 @@
+<!-- Content Wrapper. Contains page content -->
+<div ng-if="logged && user" class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <div class="col-sm-4 col-md-4 col-lg-4">
+          <h4 style="text-align: center;"><b><span style="color: #02caca;background-color: #20c99724;">
+                Salle d'attente pour la journée : {{ Selected_Date | date : 'dd/MM/yyyy' }}</span></b>
+          </h4>
+        </div><!-- /.col -->
+        <div ng-if="permission_patients_rdvs.can_create" class="row col-sm-2 col-md-2 col-lg-2 "
+          style="margin-top: 10px;">
+          <a class="col align-self-end btn btn-app" data-toggle="modal" data-target="#Add_RDV_Modal" rel="tooltip"
+            data-placement="bottom" title="Ajouter un Rendez-Vous" ng-click="vm.Selected_Patient_RDV_Etat = etats[5]">
+            <span class="badge bg-teal">{{All_RDVs.length}}</span>
+            <span class="spinner-grow spinner-grow-sm badge_left" role="status" aria-hidden="true"></span>
+            <i class="fa fa-clock-o-plus"></i> Ajouter un Rendez-Vous
+          </a>
+        </div>
+        <div ng-if="permission_patients_rdvs.can_update" class="row col-sm-2 col-md-2 col-lg-2 "
+          style="margin-top: 10px;">
+          <a class="col align-self-end btn btn-app" rel="tooltip" data-placement="bottom"
+            title="Envoyez un mail de rappel pour les rdv non confirmés"
+            ng-click="send_mail_diffusion(All_RDVs_Unconfirmed_Today)">
+            <span class="spinner-grow spinner-grow-sm badge_left" role="status" aria-hidden="true"></span>
+            <i class="fas fa-envelope-open-text"></i> Mail de rappel (Rdvs Non confirmés)
+          </a>
+        </div>
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+  <!-- /.content-header -->
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+
+      <!-- Main row -->
+      <div class="row" style="width: 100%;margin: auto;">
+        <div class="card card col-sm-12 col-md-12">
+          <div ng-show="vm.showHelp" class="alert alert-warning alert-dismissible"
+            style="max-width: 95%; margin: auto;">
+            <button type="button" class="close" ng-click="vm.showHelp=!vm.showHelp">×</button>
+            <span ng-show="vm.showHelp" class="fnl_help">?</span>
+            <h6 style="margin: auto;">
+              <span class="badge bg-dark ng-binding">1</span> Créer une liste <svg class="bi bi-arrow-right" width="1em"
+                height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd"
+                  d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
+                  clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
+                  clip-rule="evenodd" />
+              </svg> <span class="badge bg-dark ng-binding">2</span> Importer/Traiter les patients
+              <svg class="bi bi-arrow-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd"
+                  d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
+                  clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
+                  clip-rule="evenodd" />
+              </svg> <span class="badge bg-dark ng-binding">3</span> Valider la liste.
+            </h6>
+
+          </div>
+          <!-- /.card-header -->
+          <!-- Main content -->
+          <div class="row" style="width: 100%;margin: auto;margin-top: 10px;">
+
+            <div ng-if="permission_patients_rdvs.can_update" class="col-sm-12 col-md-4 col-lg-4" id="accordion">
+              <div class="card">
+                <div class="card-header" id="headingFauteuil" style="background-color: #3c8dbc;">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseFauteuil"
+                      aria-expanded="true" aria-controls="collapseFauteuil" style="font-size: larger;color: white;">
+
+                      <img src="../app-content/img/dental_chair.png" alt="Cabinet Dentaire" style="width : 20%">
+
+                      Patient au fauteuil : <b>{{All_RDVs_Au_Fauteuil_Today.length}}</b>
+
+                    </button>
+                  </h5>
+                </div>
+
+                <div id="collapseFauteuil" class="collapse show" aria-labelledby="headingFauteuil"
+                  data-parent="#accordion">
+                  <div class="row"
+                    style="width: 100%;margin: auto;text-align: center;padding: 10px;overflow-wrap: normal;font-size: x-small;">
+                    <div
+                      ng-repeat="rdv in All_RDVs_Au_Fauteuil_Today =  (All_RDVs | filter: {Is_Dates_Equals: true , etat_id: 0} | orderBy:'startsAt')  track by $index"
+                      class="card_id col-2"
+                      style="height: 160px;width: 100%;margin: auto;padding: initial;margin-bottom: 10px;" rel="tooltip"
+                      data-placement="top"
+                      title="{{' (de ' +(rdv.startsAt | date:  'HH:mm')  + ' à ' + (rdv.endsAt | date:  'HH:mm')+ ') ' + rdv.title;}}"
+                      ng-class="{ 'red' : isDatesPassed(rdv.startsAt)}">
+                      <div class="btn-group" role="group" aria-label="Fauteuil group" style="margin-bottom: 5px;">
+                        <button type="button" class="btn btn-sm btn-secondary" rel="tooltip" title="Terminée ?"
+                          data-placement="top"
+                          ng-click="Edit_RDV(rdv.patient_id, rdv.id,rdv.startsAt,rdv.endsAt, 1,'presented',rdv,$index)"><i
+                            class="far fa-thumbs-up"></i></button>
+                        <button type="button" class="btn btn-sm btn-secondary" rel="tooltip" title="Annulé ?"
+                          data-placement="top"
+                          ng-click="Edit_RDV(rdv.patient_id, rdv.id,rdv.startsAt,rdv.endsAt, 5,'presented',rdv,$index)"><i
+                            class="fa fa-times"></i></button>
+                      </div>
+                      <br>
+                      <span style="color: green;">
+                        <i ng-show="isDatesPassed(rdv.startsAt) " class="fas fa-hourglass-end" rel="tooltip"
+                          title="En retard" data-placement="top"></i>
+                        <b>({{($index+1)}})</b></span> {{rdv.startsAt | date:"RDV 'à ' HH:mm"}}
+                      <svg style="color: {{rdv.color.primary}};" width="5em" height="5em" viewBox="0 0 16 16"
+                        class="bi bi-person-check-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm9.854-2.854a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z" />
+                      </svg>
+                      <div class="card_container">
+                        <p style="font-size: x-small;margin-bottom: 0rem;">
+                          {{rdv.title.replace(':','').substring(0,28)+'...'}}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header" id="headingZero" style="background-color: #0a5fb629;">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseZero" aria-expanded="true"
+                      aria-controls="collapseZero" style="font-size: larger;">
+
+                      <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-people" fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1h7.956a.274.274 0 0 0 .014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 0 0 .022.004zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" />
+                      </svg>
+
+                      Salle d'attente : <b>{{All_RDVs_Presented_Today.length}}</b>
+
+                    </button>
+                  </h5>
+                </div>
+
+                <div id="collapseZero" class="collapse show" aria-labelledby="headingZero" data-parent="#accordion">
+                  <div class="row"
+                    style="width: 100%;margin: auto;text-align: center;padding: 10px;overflow-wrap: normal;font-size: x-small;">
+                    <div
+                      ng-repeat="rdv in All_RDVs_Presented_Today =  (All_RDVs | filter: {Is_Dates_Equals: true , etat_id: 2} | orderBy:'startsAt')  track by $index"
+                      class="card_id col-2"
+                      style="height: 160px;width: 100%;margin: auto;padding: initial;margin-bottom: 10px;" rel="tooltip"
+                      data-placement="top"
+                      title="{{' (de ' +(rdv.startsAt | date:  'HH:mm')  + ' à ' + (rdv.endsAt | date:  'HH:mm')+ ') ' + rdv.title;}}"
+                      ng-class="{ 'red' : isDatesPassed(rdv.startsAt)}">
+                      <div class="btn-group" role="group" aria-label="Zero group" style="margin-bottom: 5px;">
+                        <!-- A pg function is triggred when etat_id is passed from 0 to 1 to add new consultation-->
+                        <button type="button" class="btn btn-sm btn-secondary" rel="tooltip"
+                          title="Passer au fauteuil ?" data-placement="top"
+                          ng-click="Edit_RDV(rdv.patient_id, rdv.id,rdv.startsAt,rdv.endsAt, 0,'presented',rdv,$index)">
+                          <i class="fa fa-street-view"></i></button>
+                        <button type="button" class="btn btn-sm btn-secondary" rel="tooltip" title="Annulé ?"
+                          data-placement="top"
+                          ng-click="Edit_RDV(rdv.patient_id, rdv.id,rdv.startsAt,rdv.endsAt, 5,'presented',rdv,$index)"><i
+                            class="fa fa-times"></i></button>
+                      </div>
+                      <br>
+                      <span style="color: green;">
+                        <i ng-show="isDatesPassed(rdv.startsAt) " class="fas fa-hourglass-end" rel="tooltip"
+                          title="En retard" data-placement="top"></i>
+                        <b>({{($index+1)}})</b></span> {{rdv.startsAt | date:"RDV 'à ' HH:mm"}}
+                      <svg style="color: {{rdv.color.primary}};" width="5em" height="5em" viewBox="0 0 16 16"
+                        class="bi bi-person-check-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm9.854-2.854a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z" />
+                      </svg>
+                      <div class="card_container">
+                        <p style="font-size: x-small;margin-bottom: 0rem;">
+                          {{rdv.title.replace(':','').substring(0,28)+'...'}}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header" id="headingOne" style="background-color: #1db60a29;">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne"
+                      aria-expanded="false" aria-controls="collapseOne" style="font-size: larger;">
+                      <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-telephone-outbound"
+                        fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511zM11 .5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V1.707l-4.146 4.147a.5.5 0 0 1-.708-.708L14.293 1H11.5a.5.5 0 0 1-.5-.5z" />
+                      </svg>
+                      Rendez-Vous Confirmés : <b>{{All_RDVs_Confirmed_Today.length}}</b>
+
+                    </button>
+                  </h5>
+                </div>
+
+                <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                  <div class="row"
+                    style="width: 100%;margin: auto;text-align: center;padding: 10px;overflow-wrap: normal;font-size: x-small;">
+                    <div
+                      ng-repeat="rdv in All_RDVs_Confirmed_Today =  (All_RDVs | filter: {Is_Dates_Equals: true , etat_id: 3} | orderBy:'startsAt')  track by $index"
+                      class="card_id col-2"
+                      style="height: 160px;width: 100%;margin: auto;padding: initial;margin-bottom: 10px;">
+                      <div class="btn-group" role="group" aria-label="One group" style="margin-bottom: 5px;">
+                        <button type="button" class="btn btn-sm btn-secondary" rel="tooltip" title="Présent ?"
+                          data-placement="top"
+                          ng-click="Edit_RDV(rdv.patient_id, rdv.id,rdv.startsAt,rdv.endsAt, 2,'confirmed',rdv,$index)"><i
+                            class="fa fa-check"></i></button>
+                        <button type="button" class="btn btn-sm btn-secondary" rel="tooltip" title="Annulé ?"
+                          data-placement="top"
+                          ng-click="Edit_RDV(rdv.patient_id, rdv.id,rdv.startsAt,rdv.endsAt, 5,'confirmed',rdv,$index)"><i
+                            class="fa fa-times"></i></button>
+                      </div>
+                      {{rdv.startsAt | date:"RDV 'à ' HH:mm"}}
+                      <svg style="color: {{rdv.color.primary}};" width="5em" height="5em" viewBox="0 0 16 16"
+                        class="bi bi-person-check-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm9.854-2.854a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z" />
+                      </svg>
+                      <div class="card_container">
+                        <p style="font-size: x-small;margin-bottom: 0rem;">
+                          {{rdv.title.replace(':','').substring(0,28)+'...'}}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header" id="headingTwo" style="background-color: #b6610a29;">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
+                      aria-expanded="false" aria-controls="collapseTwo" style="font-size: larger;">
+                      <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-telephone-x" fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511zm9.262 1.135a.5.5 0 0 1 .708 0L13 2.793l1.146-1.147a.5.5 0 0 1 .708.708L13.707 3.5l1.147 1.146a.5.5 0 0 1-.708.708L13 4.207l-1.146 1.147a.5.5 0 0 1-.708-.708L12.293 3.5l-1.147-1.146a.5.5 0 0 1 0-.708z" />
+                      </svg>
+                      Rendez-Vous Non Confirmés : <b>{{All_RDVs_Unconfirmed_Today.length}}</b>
+
+                    </button>
+                  </h5>
+                </div>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                  <div class="row"
+                    style="width: 100%;margin: auto;text-align: center;padding: 10px;overflow-wrap: normal;font-size: x-small;">
+                    <div
+                      ng-repeat="rdv in  All_RDVs_Unconfirmed_Today =  (All_RDVs | filter: {Is_Dates_Equals: true , etat_id: 4} | orderBy:'startsAt')  track by $index"
+                      class="card_id col-2"
+                      style="height: 160px;width: 100%;margin: auto;padding: initial;margin-bottom: 10px;">
+                      <div class="btn-group" role="group" aria-label="Third group" style="margin-bottom: 5px;">
+                        <button type="button" class="btn btn-sm btn-secondary" rel="tooltip" title="Confirmé ?"
+                          data-placement="top"
+                          ng-click="Edit_RDV(rdv.patient_id, rdv.id,rdv.startsAt,rdv.endsAt, 3,'unconfirmed',rdv,$index)"><i
+                            class="fa fa-check"></i></button>
+                        <button type="button" class="btn btn-sm btn-secondary" rel="tooltip" title="Annulé ?"
+                          data-placement="top"
+                          ng-click="Edit_RDV(rdv.patient_id, rdv.id,rdv.startsAt,rdv.endsAt, 5,'unconfirmed',rdv,$index)"><i
+                            class="fa fa-times"></i></button>
+                      </div>
+                      {{rdv.startsAt | date:"RDV 'à ' HH:mm"}}
+                      <svg style="color: {{rdv.color.primary}};" width="5em" height="5em" viewBox="0 0 16 16"
+                        class="bi bi-person-check-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm9.854-2.854a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z" />
+                      </svg>
+                      <div class="card_container">
+                        <p style="font-size: x-small;margin-bottom: 0rem;">
+                          {{rdv.title.replace(':','').substring(0,28)+'...'}}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header" id="headingThree" style="background-color: #ff000029;">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree"
+                      aria-expanded="false" aria-controls="collapseThree" style="font-size: larger;">
+                      <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-person-x" fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zm1.146-7.85a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z" />
+                      </svg>
+                      Rendez-Vous Annulés : <b>{{All_RDVs_Canceled_Today.length}}</b>
+
+                    </button>
+                  </h5>
+                </div>
+                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                  <div class="row"
+                    style="width: 100%;margin: auto;text-align: center;padding: 10px;overflow-wrap: normal;font-size: x-small;">
+                    <div
+                      ng-repeat="rdv in All_RDVs_Canceled_Today =  (All_RDVs | filter: {Is_Dates_Equals: true , etat_id: 5} | orderBy:'startsAt')  track by $index"
+                      class="card_id col-2"
+                      style="height: 160px;width: 100%;margin: auto;padding: initial;margin-bottom: 10px;">
+                      <div class="btn-group" role="group" aria-label="Four group" style="margin-bottom: 5px;">
+                        <button type="button" class="btn btn-sm btn-secondary" rel="tooltip" title="Présent ?"
+                          data-placement="top"
+                          ng-click="Edit_RDV(rdv.patient_id, rdv.id,rdv.startsAt,rdv.endsAt, 2,'canceled',rdv,$index)"><i
+                            class="fa fa-check"></i></button>
+                        <button type="button" class="btn btn-sm btn-secondary" rel="tooltip" title="Non confirmé ?"
+                          data-placement="top"
+                          ng-click="Edit_RDV(rdv.patient_id, rdv.id,rdv.startsAt,rdv.endsAt, 4,'canceled',rdv,$index)"><i
+                            class="fa fa-clock-o"></i></button>
+                      </div>
+                      {{rdv.startsAt | date:"RDV 'à ' HH:mm"}}
+                      <svg style="color: {{rdv.color.primary}};" width="5em" height="5em" viewBox="0 0 16 16"
+                        class="bi bi-person-check-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm9.854-2.854a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z" />
+                      </svg>
+                      <div class="card_container">
+                        <p style="font-size: x-small;margin-bottom: 0rem;">
+                          {{rdv.title.replace(':','').substring(0,28)+'...'}}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header" id="headingFour" style="background-color: #17a2b873;">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour"
+                      aria-expanded="false" aria-controls="collapseFour" style="font-size: larger;">
+                      <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-person-check" fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zm4.854-7.85a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z" />
+                      </svg>
+                      Patients Traités Aujourd'hui : <b>{{All_RDVs_Processed_Today.length}}</b>
+                    </button>
+                  </h5>
+                </div>
+                <div id="collapseFour" class="collapse" aria-labelledby="collapseFour" data-parent="#accordion">
+                  <div class="row"
+                    style="width: 100%;margin: auto;text-align: center;padding: 10px;overflow-wrap: normal;font-size: x-small;">
+                    <div
+                      ng-repeat="rdv in All_RDVs_Processed_Today =  (All_RDVs | filter: {Is_Dates_Equals: true , etat_id: 1} | orderBy:'startsAt')  track by $index"
+                      class="card_id col-2"
+                      style="height: 160px;width: 100%;margin: auto;padding: initial;margin-bottom: 10px;">
+                      <div class="btn-group" role="group" aria-label="Four group" style="margin-bottom: 5px;">
+                        <button type="button" class="btn btn-sm btn-secondary" rel="tooltip" title="Présent ?"
+                          data-placement="top"
+                          ng-click="Edit_RDV(rdv.patient_id, rdv.id,rdv.startsAt,rdv.endsAt, 2,'processed',rdv,$index)"><i
+                            class="fa fa-check"></i></button>
+                        <button type="button" class="btn btn-sm btn-secondary" rel="tooltip" title="Annulé ?"
+                          data-placement="top"
+                          ng-click="Edit_RDV(rdv.patient_id, rdv.id,rdv.startsAt,rdv.endsAt, 5,'processed',rdv,$index)"><i
+                            class="fa fa-times"></i></button>
+                      </div>
+                      {{rdv.startsAt | date:"RDV 'à ' HH:mm"}}
+                      <svg style="color: {{rdv.color.primary}};" width="5em" height="5em" viewBox="0 0 16 16"
+                        class="bi bi-person-check-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm9.854-2.854a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z" />
+                      </svg>
+                      <div class="card_container">
+                        <p style="font-size: x-small;margin-bottom: 0rem;">
+                          {{rdv.title.replace(':','').substring(0,28)+'...'}}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div ng-if="permission_patients_rdvs.can_read" class="col-sm-12 col-md-8 col-lg-8"
+              id="Patient_Calendrier_RDV" ng-init="calendarView='day';">
+              <div class="row" style="width: 100%;">
+                <div class="col-md-6 text-center" style="margin: auto">
+                  <div class="btn-group">
+                    <button class="btn btn-primary" mwl-date-modifier date="viewDate" decrement="calendarView"
+                      ng-click="past_today_next(viewDate)">
+                      Précédent
+                    </button>
+                    <button class="btn btn-default" mwl-date-modifier date="viewDate" set-to-today
+                      ng-click="past_today_next(viewDate)">
+                      Aujourdh'ui
+                    </button>
+                    <button class="btn btn-primary" mwl-date-modifier date="viewDate" increment="calendarView"
+                      ng-click="past_today_next(viewDate)">
+                      Suivant
+                    </button>
+                  </div>
+                  <a href="" class="nav-link" data-toggle="tooltip" data-placement="top" title="Heure"
+                    style="font-family: monospace; font-size: x-large;color: black;">
+                    {{theclock}}
+                  </a>
+                </div>
+                <div class="col-md-6 text-center" style="margin: auto">
+
+
+                  <div class="d-flex justify-content-center align-self-center custom-control custom-checkbox">
+                    <input id="Show24HoursBox" ng-model="Show24Hours" class="custom-control-input" type="checkbox"
+                      ng-check="Show24Hours = !Show24Hours">
+                    <label for="Show24HoursBox" class="custom-control-label"> Afficher toute la journé (24H)</label>
+                  </div>
+
+                  <div>
+                    <label for="split">Affichage par : {{split}} minutes</label>
+                    <input id="split" type="range" class="custom-range" ng-model="split" min="1" max="60"
+                      style="max-width: 50%;float: right;margin-top: 5px;">
+                  </div>
+
+                  <div>
+                    <label for="show_interval">Afficher un plan de {{show_interval}} heures</label>
+                    <input id="show_interval" type="range" class="custom-range" ng-model="show_interval" min="1"
+                      max="23" style="max-width: 50%;float: right;margin-top: 5px;">
+                  </div>
+
+                </div>
+              </div>
+              <mwl-calendar style="margin: auto;" events="All_RDVs" view="vm.calendarView" view-title="calendarTitle"
+                view-date="viewDate" on-event-click="eventClicked(calendarEvent)"
+                on-event-times-changed="eventTimesChanged(calendarEvent, calendarNewEventStart,calendarNewEventEnd); calendarEvent.startsAt = calendarNewEventStart; calendarEvent.endsAt = calendarNewEventEnd"
+                cell-is-open="cellIsOpen" day-view-split="{{split}}"
+                day-view-start="{{Show24Hours?'00:00':CalendarStartingHour}}"
+                day-view-end="{{Show24Hours?'23:59':CalendarEndingHour}}" cell-modifier="modifyCell(calendarCell)"
+                cell-auto-open-disabled="false"
+                on-timespan-click="vm.timespanClicked('#Add_RDV_Modal',calendarDate, calendarCell)"
+                ng-click="vm.Selected_Patient_RDV_Etat = etats[5]">
+              </mwl-calendar>
+            </div>
+
+          </div>
+          <!-- END Main content -->
+          <!-- /.card-body -->
+        </div>
+      </div>
+      <!-- /.row (main row) -->
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+
+<!---------------------------Add new RDV ------------------------------------------------->
+<div ng-if="permission_patients_rdvs.can_create" id="Add_RDV_Modal" class="modal fade show"
+  style="display: none; padding-right: 16px;" aria-modal="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <form id="Add_RDV_Form" name="Add_RDV_Form" role="form"
+        ng-submit="Add_RDV('#Add_RDV_Modal',Add_RDV_Form.$valid,vm.Selected_Patient_RDV,vm.Selected_Patient_RDV_Motif,vm.Selected_Patient_RDV_Color, vm.Selected_Patient_RDV_Etat,vm.Selected_Patient_RDV_startsAt, vm.Selected_Patient_RDV_endsAt)">
+        <div class="modal-header">
+          <h6 class="modal-title">Ajouter un nouveau RDV</h6>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row" style="width: 90%;margin: auto;">
+            <div class="col-sm-8 col-md-8 col-lg-8">
+              <label><i class="fas fa-bullseye"></i> Patient
+                <button type="button" class="close float-right" style="color: green;font-size: 12px;"
+                  data-toggle="modal" data-target="#Add_Patients_modal" rel="tooltip" title="Ajouter un nouveau patient"
+                  data-placement="bottom">
+                  <span aria-hidden="true"><i class="fas fa-plus-circle"></i></span>
+                </button>
+              </label>
+              <div class="form-group" data-toggle="tooltip" data-placement="top"
+                title="Uniquement les patients dont le résultat de contrôle a été négatif seront affichés">
+                <select name="Patient_Nouveau_RDVs_Patient" class="form-control select2 select2-hidden-accessible"
+                  style="width: 100%;" data-select2-id="2" tabindex="-1" aria-hidden="true" ng-model="vm.CurrentPatient"
+                  ng-change="vm.SelectPatientForRDV(vm.CurrentPatient)" required>
+                  <option value="">Selectionnez un patient à pointer</option>
+                  <option ng-repeat="patient in All_Patients track by patient.id" value="{{patient}}">
+                    {{patient.lib}}
+                  </option>
+                </select>
+                <span style="color:red"
+                  ng-if="Add_RDV_Form.Patient_Nouveau_RDVs_Patient.$dirty && Add_RDV_Form.Patient_Nouveau_RDVs_Patient.$error.required"
+                  class="help-block">Attention : le patient est obligatoire</span>
+              </div>
+              <!-- /.form-group -->
+            </div>
+            <div class="col-sm-4 col-md-4 col-lg-4">
+              <div class="form-group">
+                <label for="etat_id"><i class="fas fa-bullseye"></i>
+                  Etat du RDV
+                  <button type="button" class="close float-right" style="color: green;font-size: 12px;"
+                    ng-click="Upload_Static_Table_To_Modal('etats',etats)" data-toggle="modal"
+                    data-target="#Static_Table_Modal" rel="tooltip" title="Ajouter un nouveau etat"
+                    data-placement="bottom">
+                    <span aria-hidden="true"><i class="fas fa-plus-circle"></i></span>
+                  </button>
+                </label>
+                <select id="static_table_box_etat_id" name="static_table_box_etat_id" class="form-control"
+                  style="border-color: #343a40;" ng-model="vm.Selected_Patient_RDV_Etat"
+                  ng-options="item.designation for item in etats" required>
+                  <option></option>
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-8 col-md-8 col-lg-8">
+              <div class="form-group">
+                <label for="motif_id"><i class="fas fa-bullseye"></i>
+                  Motif
+                  <button type="button" class="close float-right" style="color: green;font-size: 12px;"
+                    ng-click="Upload_Static_Table_To_Modal('motifs',motifs)" data-toggle="modal"
+                    data-target="#Static_Table_Modal" rel="tooltip" title="Ajouter un nouveau motif"
+                    data-placement="bottom">
+                    <span aria-hidden="true"><i class="fas fa-plus-circle"></i></span>
+                  </button>
+                </label>
+                <select id="static_table_box_motif_id" name="static_table_box_motif_id" class="form-control"
+                  style="border-color: #343a40;" ng-model="vm.Selected_Patient_RDV_Motif"
+                  ng-options="item.designation for item in motifs" required>
+                  <option></option>
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-4 col-md-4 col-lg-4">
+              <div class="form-group">
+                <label><i class="fas fa-palette"></i> Couleur</label>
+                <input class="form-control" colorpicker type="color" ng-model="vm.Selected_Patient_RDV_Color.primary">
+                <input class="form-control" colorpicker type="hidden"
+                  ng-model="vm.Selected_Patient_RDV_Color.secondary">
+              </div>
+            </div>
+
+
+            <div class="col-sm-8 col-md-8 col-lg-8">
+              <!-- select -->
+              <div class="form-group">
+                <label for="procedure"><i class="far fa-play-circle"></i>
+                  Commence à</label>
+                <p class="input-group" style="max-width: 250px">
+                  <input type="text" class="form-control" readonly uib-datepicker-popup="dd MMMM yyyy"
+                    ng-model="vm.Selected_Patient_RDV_startsAt" ng-change="startsAt_Changed()"
+                    is-open="vm.Selected_Patient_RDV_startOpen" min-date="vm.Selected_Patient_RDV_startsAt"
+                    ng-required="true" current-text="Aujourdh'ui" close-text="Fermer" clear-text="Effacer" required>
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-default"
+                      ng-click="vm.Selected_Patient_RDV_startOpen = !vm.Selected_Patient_RDV_startOpen">
+                      <i class="fas fa-calendar-alt"></i>
+                    </button>
+                  </span>
+                </p>
+              </div>
+            </div>
+            <hr style="margin: 5;border-style: groove;">
+            <div class="col-sm-4 col-md-4 col-lg-4">
+              <div class="form-group">
+                <div uib-timepicker ng-model="vm.Selected_Patient_RDV_startsAt" hour-step="1" minute-step="15"
+                  ng-change="startsAt_Changed()" show-meridian="false">
+                </div>
+              </div>
+            </div>
+
+
+            <div class="col-sm-8 col-md-8 col-lg-8">
+              <div class="form-group">
+                <label for="actes"><i class="far fa-stop-circle"></i>
+                  Termine à
+                </label>
+                <p class="input-group" style="max-width: 250px">
+                  <input type="text" class="form-control" readonly uib-datepicker-popup="dd MMMM yyyy"
+                    ng-model="vm.Selected_Patient_RDV_endsAt" is-open="false"
+                    min-date="vm.Selected_Patient_RDV_startsAt" ng-required="true" current-text="Aujourdh'ui"
+                    close-text="Fermer" clear-text="Effacer" required>
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-default"
+                      ng-click="vm.Selected_Patient_RDV_endOpen = !vm.Selected_Patient_RDV_endOpen">
+                      <i class="fas fa-calendar-alt"></i>
+                    </button>
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div class="col-sm-4 col-md-4 col-lg-4">
+              <div class="form-group">
+                <div uib-timepicker ng-model="vm.Selected_Patient_RDV_endsAt" hour-step="1" minute-step="15"
+                  min-date="vm.Selected_Patient_RDV_startsAt" show-meridian="false">
+                </div>
+              </div>
+            </div>
+
+
+
+
+
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary float-right" title="Cliquez pour Ajouter un rdv"
+            data-toggle="tooltip">Ajouter</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+<!--------------------------- Ajouter Patient Modal ---------------------------------------->
+<div ng-if="permission_patients.can_create" class="modal fade show" id="Add_Patients_modal" style="display: none;"
+  aria-modal="true">
+  <form id="Add_Patients_Form" name="Add_Patients_Form"
+    ng-submit="vm.Add_Patient(New_Patient,'#Add_Patients_modal',Add_Patients_Form.$valid)" role="form">
+    <div class="modal-dialog modal-xl" style="overflow-x: hidden;overflow-y: auto!important;height: 95%;">
+      <div class="modal-content">
+        <div class="modal-header bg-success">
+          <h4 class="modal-title"><i class="fas fa-folder-plus"></i> Ajouter un nouveau patient
+          </h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="card card-warning">
+            <!-- /.card-header -->
+            <div class="card-body">
+              <div class="form-group row">
+                <label ng-if="false" class="col-sm-2 col-md-2 col-lg-2 col-form-label">Nin</label>
+                <div ng-if="false" class="col-sm-4 col-md-4 col-lg-4">
+                  <input class="form-control" style="width: auto; height: auto; padding: auto;"
+                    ng-class="{ 'is-invalid' : Add_Patients_Form.Add_Patients_FormNin.$invalid }" type="text"
+                    id="Add_Patients_FormNin" name="Add_Patients_FormNin" ng-model="New_Patient.nin" pattern="\d{18}"
+                    oninput="this.setCustomValidity('')"
+                    oninvalid="this.setCustomValidity('Le numéro d\'identification national, est un numéro porté sur 18 positions')"
+                    placeholder="Entrer NIN ..." />
+                </div>
+
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Nom</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <input class="form-control" style="width: auto; height: auto; padding: auto;"
+                    ng-class="{ 'is-invalid' : Add_Patients_Form.Add_Patients_FormNom.$invalid }" type="text"
+                    name="Add_Patients_FormNom" ng-model="New_Patient.nom" minlength="2"
+                    pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$" placeholder="Entrer Nom ..." required />
+                </div>
+
+                <label ng-if="false" class="col-sm-2 col-md-2 col-lg-2 col-form-label">Nom de jeune fille</label>
+                <div ng-if="false" class="col-sm-4 col-md-4 col-lg-4">
+                  <input class="form-control" style="width: auto; height: auto; padding: auto;"
+                    ng-class="{ 'is-invalid' : Add_Patients_Form.Add_Patients_FormNJF.$invalid }" type="text"
+                    name="Add_Patients_FormNJF" ng-model="New_Patient.nom_jeune_fille" placeholder="Entrer NJF ..." />
+                </div>
+
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Prénom</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <input class="form-control" style="width: auto; height: auto; padding: auto;" type="text"
+                    ng-class="{ 'is-invalid' : Add_Patients_Form.Add_Patients_FormPrenom.$invalid }"
+                    name="Add_Patients_FormPrenom" ng-model="New_Patient.prenom" minlength="2"
+                    pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$" placeholder="Enter Prénom..." required />
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Date naissance</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <input class="form-control masked_date" style="width: auto; height: auto; padding: auto;" type="text"
+                    ng-class="{ 'is-invalid' : Add_Patients_Form.Add_Patients_FormDate_naiss.$invalid }"
+                    name="Add_Patients_FormDate_naiss{{New_Patient.num}}" ng-model="New_Patient.date_naiss"
+                    placeholder="dd/MM/yyyy" pattern="(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d"
+                    required />
+                </div>
+
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Type date naissance</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <select class="form-control" style="width: auto; height: auto; padding: auto;"
+                    name="Add_Patients_FormTDN"
+                    ng-class="{ 'is-invalid' : Add_Patients_Form.Add_Patients_FormTDN.$invalid }"
+                    ng-model="New_Patient.type_date_naiss" placeholder="Entrer Type date naissance">
+                    <option value=""></option>
+                    <option ng-repeat="tdn in types_date_naiss" value="{{tdn.id}}">
+                      {{tdn.designation}}
+                    </option>
+                  </select>
+                </div>
+
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Lieu de naissance</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <input class="form-control" style="width: auto; height: auto; padding: auto;" type="text"
+                    ng-class="{ 'is-invalid' : Add_Patients_Form.Add_Patients_FormLieuNaiss.$invalid }"
+                    name="Add_Patients_FormLieuNaiss" ng-model="New_Patient.lieu_naiss" minlength="2"
+                    placeholder="Enter Lieu de naissance..." />
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Sexe</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <select class="form-control" style="width: auto; height: auto; padding: auto;"
+                    name="Add_Patients_FormSexe"
+                    ng-class="{ 'is-invalid' : Add_Patients_Form.Add_Patients_FormSexe.$invalid }"
+                    ng-model="New_Patient.sexe" placeholder="Enter le sexe..." required>
+                    <option value=""></option>
+                    <option ng-repeat="sexe in sexes" value="{{sexe.id}}">
+                      {{sexe.designation}}
+                    </option>
+                  </select>
+                </div>
+
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Situation familiale</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <select class="form-control" style="width: auto; height: auto; padding: auto;"
+                    name="Add_Patients_FormSTF"
+                    ng-class="{ 'is-invalid' : Add_Patients_Form.Add_Patients_FormSTF.$invalid }"
+                    ng-model="New_Patient.situation_familiale" placeholder="Enter situation familiale...">
+                    <option value=""></option>
+                    <option ng-repeat="sitf in situations_familiales" value="{{sitf.id}}">
+                      {{sitf.designation}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div ng-if="false" class="form-group row">
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Prénom père</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <input class="form-control" style="width: auto; height: auto; padding: auto;"
+                    ng-class="{ 'is-invalid' : Add_Patients_Form.Add_Patients_FormPpere.$invalid }" type="text"
+                    name="Add_Patients_FormPpere" ng-model="New_Patient.ppere" minlength="2"
+                    pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$" placeholder="Entrer Prénom père ..." />
+                </div>
+
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Nom mère</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <input class="form-control" style="width: auto; height: auto; padding: auto;"
+                    ng-class="{ 'is-invalid' : Add_Patients_Form.Add_Patients_FormNmere.$invalid }" type="text"
+                    name="Add_Patients_FormNmere" ng-model="New_Patient.nmere" minlength="2"
+                    pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$" placeholder="Entrer Nom mère ..." />
+                </div>
+
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Prénom mère</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <input class="form-control" style="width: auto; height: auto; padding: auto;"
+                    ng-class="{ 'is-invalid' : Add_Patients_Form.Add_Patients_FormPmere.$invalid }" type="text"
+                    name="Add_Patients_FormPmere" ng-model="New_Patient.pmere" minlength="2"
+                    pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$" placeholder="Entrer Prénom mère ..." />
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">N°Téléphone</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <input type="text" ng-model="New_Patient.tel" class="form-control masked_tel"
+                    placeholder="0672 16 75 75" name="Add_Patients_FormTel" />
+                </div>
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Email</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <input type="email" ng-model="New_Patient.email" class="form-control" placeholder="Enter email..."
+                    name="Add_Patients_FormEmail" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Adresse</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <input type="text" ng-model="New_Patient.adresse" class="form-control" placeholder="Enter adresse..."
+                    name="Add_Patients_FormAdresse" />
+                </div>
+
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label"></label>
+                <div class="col-sm-4 col-md-4 col-lg-4"></div>
+              </div>
+
+              <div class="form-group row">
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Wilaya</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <select class="form-control" name="Add_Patients_FormWilaya"
+                    ng-options="wilaya.id as wilaya.designation for wilaya in wilayas" ng-model="New_Patient.wilaya_id"
+                    ng-change="CommunesOfWilaya(New_Patient.wilaya_id)" placeholder="Enter wilaya...">
+                  </select>
+                </div>
+
+                <label class="col-sm-2 col-md-2 col-lg-2 col-form-label">Commune</label>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <select class="form-control" name="Add_Patients_FormCommune"
+                    ng-options="commune.id as commune.designation for commune in Communes_wilaya"
+                    ng-model="New_Patient.commune_id" placeholder="Enter commune...">
+                  </select>
+                </div>
+              </div>
+            </div>
+            <!-- /.card-body -->
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-success">Ajouter</button>
+        </div>
+      </div>
+
+      <!-- /.modal-content -->
+    </div>
+  </form>
+  <!-- /.modal-dialog -->
+</div>
+
+<!--*********************** Static Tables Modal ******************************-->
+<div ng-if="permission_static_tables.can_create" class="modal fade show" id="Static_Table_Modal"
+  style="display: none;  z-index: 10000000 !important;" aria-modal="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h4 class="modal-title">
+          <i class="fas fa-bars"></i>
+          Table : {{Selected_Static_Table_Name}}
+        </h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="card card-warning">
+          <!-- /.card-header -->
+          <div class="card-body">
+            <form role="form" id="Static_Table_Form" name="Static_Table_Form">
+              <div class="row" style="width:100%">
+                <div class="input-group col-10" rel="tooltip" title="Rechercher une demande de contrôle"
+                  data-placement="bottom">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><svg class="bi bi-search" width="1em" height="1em"
+                        viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M10.442 10.442a1 1 0 011.415 0l3.85 3.85a1 1 0 01-1.414 1.415l-3.85-3.85a1 1 0 010-1.415z"
+                          clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                          d="M6.5 12a5.5 5.5 0 100-11 5.5 5.5 0 000 11zM13 6.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
+                          clip-rule="evenodd" />
+                      </svg></span>
+                  </div>
+                  <input type="text" class="form-control" style="height: 100%;" placeholder="Filtre..."
+                    ng-model="vm.Static_Table_Filtre">
+                </div>
+                <button class="btn btn-lg btn-warning col-2" ng-click="Add_New_Object2Static_Table()"
+                  title="Cliquez pour Ajouter {{Selected_Static_Table_Name}}" data-toggle="tooltip"><i
+                    class="fas fa-plus"></i></button>
+              </div>
+
+              <div class="box-body table-responsive no-padding" style="max-height: 300px;">
+                <table class="table table-hover">
+                  <tbody>
+                    <thead>
+                      <tr>
+                        <th ng-repeat="label in Selected_Static_Table_Labels">
+                          <a>
+                            <span class="text-uppercase">{{label}}</span>
+                          </a>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tr style="cursor: pointer;"
+                      ng-repeat="ligne in dataTable = (Selected_Static_Table_Array | filter: vm.Static_Table_Filtre) track by $index"
+                      ng-click="Select_Row_Static_Table(Selected_Static_Table_Name,ligne,$index);"
+                      ng-class="{ 'table-info': Static_Table_Selected_Row.id === ligne.id }">
+                      <td>
+                        {{ligne.id}}
+                      </td>
+                      <td>
+                        <input class="form-control" type="text" name="Static_Table_Designation{{$index}}"
+                          ng-model="ligne.designation" minlength="2" placeholder="Entrer une designation{{$index}} ..."
+                          ng-change="ligne.has_changed = true" required />
+                      </td>
+                      <td ng-if="Selected_Static_Table_Name==='actes'">
+                        <select class="form-control" ng-model="ligne.procedure_id" ng-change="ligne.has_changed = true">
+                          <option ng-repeat="item in procedures" ng-value="item.id">
+                            {{item.designation}}
+                          </option>
+                        </select>
+                      </td>
+                      <td ng-if="Selected_Static_Table_Name==='actes'">
+                        <input type="text" class="form-control masked_money" placeholder="0.00" ng-model="ligne.montant"
+                          ng-change="ligne.has_changed = true">
+                      </td>
+                      <td ng-if="Selected_Static_Table_Name==='types_transactions'">
+                        <select class="form-control" ng-model="ligne.operation" ng-change="ligne.has_changed = true">
+                          <option ng-value="credit">Crédit (+)</option>
+                          <option ng-value="debit">Débit (-)</option>
+                        </select>
+                      </td>
+                      <td ng-if="Selected_Static_Table_Name==='types_transactions'">
+                        <select class="form-control" ng-model="ligne.cible" ng-change="ligne.has_changed = true">
+                          <option value="patient">Patient</option>
+                          <option value="partenaire">Partenaire</option>
+                        </select>
+                      </td>
+                      <td>
+                        <button ng-if="!ligne.id" class="btn btn-warning"
+                          ng-click="Add_Static_Table(Selected_Static_Table_Name,ligne,$index)"
+                          title="Cliquez pour enregistrer" data-toggle="tooltip"><i class="fas fa-save"></i>
+                        </button>
+
+                        <button ng-if="ligne.id && ligne.has_changed" class="btn btn-success"
+                          ng-click="Edit_Static_Table(Selected_Static_Table_Name,ligne,$index);ligne.has_changed = false;"
+                          title="Cliquez pour modifier" data-toggle="tooltip"><i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger"
+                          ng-click="Delete_Static_Table(Selected_Static_Table_Name,ligne,$index)"
+                          title="Cliquez pour supprimer" data-toggle="tooltip"><i class="far fa-trash-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer ">
+            <button type="button" class="btn btn-lg btn-success " data-dismiss="modal">ok</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

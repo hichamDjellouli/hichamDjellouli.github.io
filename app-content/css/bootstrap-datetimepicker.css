@@ -1,0 +1,15 @@
+/* override styles when printing */
+@media print {
+
+@page {
+  size: A5;
+  /*margin: 30mm 45mm 30mm 45mm;*/
+   /* change the margins as you want them to be. */
+   /*margin: auto;*/
+   text-align: center;
+}
+
+
+
+
+}

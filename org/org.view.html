@@ -1,0 +1,601 @@
+<!-- Content Wrapper. Contains page content -->
+<div ng-if="logged && user" class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2" style="margin-bottom: -0.5rem!important; ">
+        <div class="col-sm-6" style="margin: auto;">
+          <h1 class="text-dark" style="font-size: 2.8rem;">Gestion des organismes</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6 ">
+          <!-- Small boxes (Stat box) -->
+          <div class="row" style="float:right">
+            <a  ng-if="user.role_id == 0 || user.role_id == 1" class="btn btn-app" ng-click="vm.NoSelectedeorg()" data-toggle="modal" data-target="#add_org_modal">
+              <i class="fas fa-plus"></i> Ajouter
+            </a>
+            <a ng-click="vm.showHelp=!vm.showHelp" href="" class="btn btn-app" data-toggle="tooltip"
+              data-placement="top" title="Guide de l'application">
+              <i class="fa fa-question-circle"></i> Aide
+            </a>
+          </div>
+          <!-- /.row -->
+        </div><!-- /.col -->
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+  <!-- /.content-header -->
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+
+      <!-- Main row -->
+      <div class="row">
+        <div class="card card col-sm-12 col-md-12">
+          <div class="card-header ">
+
+          </div>
+          <!-- /.card-header -->
+          <div class="col-sm-12 col-md-12">
+            <ng-container>
+              <!-- TABLES, FILTERING, AND PAGINATION -->
+              <div class="container rounded">
+                <input type="text" class="form-control my-3" placeholder="Filtre..." ng-model="filterText">
+                <div class="table-responsive tableFixHead" vm.controlled>
+                  <table id="orgTable" class="table table-bordered table-hover" style="text-align: center;">
+                    <thead>
+                      <tr>
+                        <th ng-repeat="label in labels">
+                          <a ng-click="vm.sortColumn(label)">
+                            <span class="text-uppercase">{{label}}</span>
+                            <span ng-if="orderByField == label">
+                              <span ng-if="!sortByDescending">
+                                <i class="fas fa-angle-up"></i>
+                              </span>
+                              <span ng-if="sortByDescending">
+                                <i class="fas fa-angle-down"></i>
+                              </span>
+                            </span>
+                          </a>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-click="vm.openModal(org)"
+                        ng-repeat="org in filterData = (orgs | filter: filterText | orderBy : orderByField : sortByDescending) | limitTo:itemsPerPage:itemsPerPage*(currentPage-1)  track by $index"
+                        ng-class="{ 'text-white bg-info': org == selected } ">
+                        <td>
+                          <div class="d-flex justify-content-center align-self-center custom-control custom-checkbox">
+                            <input id="customCheckbox2" class="custom-control-input" type="checkbox" checked="false">
+                            <label for="customCheckbox2" class="custom-control-label"></label>
+                          </div>
+                        </td>
+                        <td>{{ org.id}}</td>
+                        <td>{{org.designation}}</td>
+                        <td>{{org.active}}
+                          <div class="custom-control custom-switch" ng-class="{'custom-switch-off-success': org.active}"
+                            ng-class="{'custom-switch-off-danger':  org.active==='undefined'}">
+                            <input id="customSwitch$index" type="checkbox" class="custom-control-input"
+                              checked='org.active'>
+                            <label class="custom-control-label" for="customSwitch$index"></label>
+                          </div>
+                        </td>
+                        <td ng-if="user.role_id == 0 || user.role_id == 1">
+                          <button class="btn btn-success" data-toggle="modal" data-target="#edit_orgs_produits_modal"
+                            ng-click="vm.GetAllOrgProduits(org.id,org)"
+                            title="Cliquez pour modifier les produits" data-toggle="tooltip">
+                            <i class="fa fa-th"></i>
+                          </button>
+                        </td>
+                        <td ng-if="user.role_id == 0 || user.role_id == 1">
+                          <button class="btn btn-success" data-toggle="modal" data-target="#edit_org_modal"
+                            ng-click="vm.Selectedeorg(org.id,org,$index)" title="Cliquez pour modifier"
+                            data-toggle="tooltip"><i class="fas fa-edit"></i></button>
+                        </td>
+                        <td ng-if="user.role_id == 0 || user.role_id == 1">
+                          <button class="btn btn-danger" ng-click="vm.deleteorg(org.id,org,$index)"
+                            title="Cliquez pour supprimer" data-toggle="tooltip"><i class="fas fa-minus"></i></button>
+                        </td>
+                      </tr>
+                    </tbody>
+
+                  </table>
+                </div>
+                <ul class="d-flex justify-content-center" uib-pagination previous-text='<<' next-text='>>'
+                  total-items="filterData.length" items-per-page="15" ng-model="currentPage" max-size="5"
+                  boundary-link-numbers="3" ng-change="vm.pageChanged()"></ul>
+              </div>
+            </ng-container>
+            Total : {{orgs.length}}
+
+          </div>
+          <!-- /.card-body -->
+        </div>
+      </div>
+      <!-- /.row (main row) -->
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+
+<!---------------------------Orgs Produits Modals---------------------------------------->
+<div class="modal fade show" id="edit_orgs_produits_modal" style="display: none;" aria-modal="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-success">
+        <h4 class="modal-title">Editer les produits de : {{vm.SelectedOrg.designation}}
+          {{vm.SelectedOrg.lname}}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="card card-warning">
+          <!-- /.card-header -->
+          <div class="card-body">
+            <form role="form" id="edit_orgs_produits_modal">
+              <div class="row">
+                <div class="col-sm-6 col-md-6 col-lg-6">
+                  <!-- select -->
+                  <div class="form-group">
+                    <label>Produits</label>
+                    <select class="form-control" name="org_produit"
+                      ng-options="prod.id as prod.designation for prod in vm.produits_without_orgproduits"
+                       ng-model="vm.SelectedProduit" required>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-sm-2 col-md-2 col-lg-2">
+                  <!-- select -->
+                  <div class="form-group">
+                    <button class="btn btn-lg btn-warning"  ng-disabled="!vm.SelectedProduit"
+                      ng-click="vm.Add_OrgProduits(vm.SelectedOrg.id,vm.SelectedProduit,$index)"
+                      title="Cliquez pour Ajouter un produit" data-toggle="tooltip"><i class="fas fa-plus"></i></button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-12">
+                 <ng-container>
+                  <div class="container rounded">
+                    <div class="table-responsive tableFixHead" vm.controlled>
+                      <table id="orgsProduitsTable"
+                        class="table table-striped table-bordered table-hover table-head-fixed text-nowrap"
+                        data-pagination="true" data-side-pagination="server" data-total-field="count"
+                        style="text-align: center;">
+                        <thead>
+                          <tr>
+                            <th ng-repeat="label in labels_orgs_produits">
+                              <a>
+                                <span class="text-uppercase">{{label}}</span>
+                              </a>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat="org_produit in vm.AllOrgsProduits  track by $index" >
+                             <td>{{org_produit.id}}</td>
+                            <td>{{org_produit.designation}}</td>
+                            <td>
+                              <button class="btn btn-danger"
+                              ng-click="vm.Delete_OrgProduits(vm.SelectedOrg.id,org_produit.id,$index)"
+                                title="Cliquez pour supprimer" data-toggle="tooltip"><i
+                                  class="fas fa-minus"></i></button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </ng-container>
+                Total : {{vm.AllOrgsProduits.length}}
+              </div>
+            </form>
+          </div>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <div class="modal-footer justify-content-between">
+         <button type="button" class="btn btn-success" data-dismiss="modal">Terminer</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+</div>
+<!---------------------------ADD Modals---------------------------------------->
+<div class="modal fade show" id="add_org_modal" style="display: none;" aria-modal="true">
+  <div ng-class="{ 'alert': flash, 'alert-success': flash.type === 'success', 'alert-danger': flash.type === 'error' }"
+    ng-if="flash" ng-bind="flash.message"></div>
+  <form name="form" ng-submit="vm.addorg(vm.Selectedorg,$index)" role="form">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-danger">
+          <h4 class="modal-title">Ajouter un nouvel utilisateur</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="card card-warning">
+            <!-- /.card-header -->
+            <div class="card-body">
+              <form role="form">
+                <div class="row">
+                  <div class="col-sm-6">
+                    <!-- select -->
+                    <div class="form-group">
+                      <label>Organisme</label>
+                      <select class="form-control" name="organisme_add" required>
+                        <option>MHUV</option>
+                        <option>CNL</option>
+                        <option>OPGI</option>
+                        <option>AADL</option>
+                        <option>DLEP</option>
+                      </select>
+                      <span style="color:red" ng-if="form.organisme_add.$dirty && form.organisme_add.$error.required"
+                        class="help-block">Attention : l'organisme est obligatoire</span>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label>Direction</label>
+                      <select class="form-control" name="direction_add" required>
+                        <option>Informatique</option>
+                        <option>RH</option>
+                        <option>Fichier National</option>
+                        <option>Autre..</option>
+                      </select>
+                      <span style="color:red" ng-if="form.direction_add.$dirty && form.direction_add.$error.required"
+                        class="help-block">Attention : la direction est obligatoire</span>
+                    </div>
+                  </div>
+                </div>
+                <!--
+              <div class="row">
+                <div class="form-group">
+                  <div class="form-check">Civilité :
+                    <br>
+                    <input class="form-check-input" type="radio" name="civilite" checked="">
+                    <label class="form-check-label">Monsieur</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="civilite" unchecked>
+                    <label class="form-check-label">Madame</label>
+                  </div>
+                </div>
+              </div>
+              -->
+                <div class="row">
+                  <div class="col-sm-6">
+                    <!-- text input -->
+                    <div class="form-group">
+                      <label>Nom</label>
+                      <input type="text" ng-model="vm.Selectedorg.fname" class="form-control" placeholder="Enter ..."
+                        name="nom_add" required>
+                      <span style="color:red" ng-if="form.nom_add.$dirty && form.nom_add.$error.required"
+                        class="help-block">Attention : le nom est obligatoire</span>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label>Prénom</label>
+                      <input type="text" ng-model="vm.Selectedorg.lname" class="form-control" placeholder="Enter ..."
+                        name="prenom_add" required>
+                      <span style="color:red" ng-if="form.prenom_add.$dirty && form.prenom_add.$error.required"
+                        class="help-block">Attention : le prenom est obligatoire</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <div class="form-group" ng-class="{ 'has-error': form.email.$dirty && form.email.$error.required }">
+                      <label>Email</label>
+                      <input type="email" class="form-control" placeholder="Email" name="email_add"
+                        ng-model="vm.Selectedorg.email" required />
+                      <span style="color:red" ng-if="form.email_add.$dirty && form.email_add.$error.required"
+                        class="help-block">Attention : l'email est obligatoire</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <!-- checkbox -->
+                    <div class="form-group">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" ng-model="vm.Selectedorg.active"
+                          name="active_add" required>
+                        <label class="form-check-label">Active ?</label>
+                        <span style="color:red" ng-if="form.active_add.$dirty && form.active_add.$error.required"
+                          class="help-block">Attention : le champ active est obligatoire</span>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <!-- /.card-body -->
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+          <button type="submit" class="btn btn-success" ng-disabled="form.$invalid">Enregistrer</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </form>
+</div>
+<!---------------------------EDIT Modals---------------------------------------->
+<div class="modal fade show" id="edit_org_modal" style="display: none;" aria-modal="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-success">
+        <h4 class="modal-title">Editer la fiche utilisateur : {{vm.Selectedorg.fname}} {{vm.Selectedorg.lname}}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="card card-warning">
+          <!-- /.card-header -->
+          <div class="card-body">
+            <form role="form">
+              <div class="row">
+                <div class="col-sm-6">
+                  <!-- select -->
+                  <div class="form-group">
+                    <label>Organisme</label>
+                    <select class="form-control" name="organisme_edit">
+                      <option>MHUV</option>
+                      <option>CNL</option>
+                      <option>OPGI</option>
+                      <option>AADL</option>
+                      <option>DLEP</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Direction</label>
+                    <select class="form-control" name="direction_edit">
+                      <option>Informatique</option>
+                      <option>RH</option>
+                      <option>Fichier National</option>
+                      <option>Autre..</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <!--
+              <div class="row">
+                <div class="form-group">
+                  <div class="form-check">Civilité :
+                    <br>
+                    <input class="form-check-input" type="radio" name="civilite" checked="">
+                    <label class="form-check-label">Monsieur</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="civilite" unchecked>
+                    <label class="form-check-label">Madame</label>
+                  </div>
+                </div>
+              </div>
+              -->
+              <div class="row">
+                <div class="col-sm-6">
+                  <!-- text input -->
+                  <div class="form-group">
+                    <label>Nom</label>
+                    <input type="text" ng-model="vm.Selectedorg.fname" class="form-control" placeholder="Enter ..."
+                      name="nom_edit">
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Prénom</label>
+                    <input type="text" ng-model="vm.Selectedorg.lname" class="form-control" placeholder="Enter ..."
+                      name="prenom_edit">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group"
+                    ng-class="{ 'has-error': form.email_edit.$dirty && form.email_edit.$error.required }">
+                    <label>Email</label>
+                    <input type="email" class="form-control" placeholder="Email" name="email_edit"
+                      ng-model="vm.Selectedorg.email" required />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <!-- checkbox -->
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" ng-model="vm.Selectedorg.active"
+                        name="active_edit">
+                      <label class="form-check-label">Active ?</label>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <!-- /.card-body -->
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-success"
+          ng-click="vm.updateorg(vm.Selectedorg,$index)">Enregistrer</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+<!---------------------------Scripts--------------------------------------------->
+
+<script type="text/javascript">
+  $(function () {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000
+    });
+
+    $('.swalDefaultSuccess').click(function () {
+      Toast.fire({
+        icon: 'success',
+        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.swalDefaultInfo').click(function () {
+      Toast.fire({
+        icon: 'info',
+        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.swalDefaultError').click(function () {
+      Toast.fire({
+        icon: 'error',
+        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.swalDefaultWarning').click(function () {
+      Toast.fire({
+        icon: 'warning',
+        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.swalDefaultQuestion').click(function () {
+      Toast.fire({
+        icon: 'question',
+        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+
+    $('.toastrDefaultSuccess').click(function () {
+      toastr.success('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
+    });
+    $('.toastrDefaultInfo').click(function () {
+      toastr.info('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
+    });
+    $('.toastrDefaultError').click(function () {
+      toastr.error('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
+    });
+    $('.toastrDefaultWarning').click(function () {
+      toastr.warning('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
+    });
+
+    $('.toastsDefaultDefault').click(function () {
+      $(document).Toasts('create', {
+        title: 'Toast Title',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultTopLeft').click(function () {
+      $(document).Toasts('create', {
+        title: 'Toast Title',
+        position: 'topLeft',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultBottomRight').click(function () {
+      $(document).Toasts('create', {
+        title: 'Toast Title',
+        position: 'bottomRight',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultBottomLeft').click(function () {
+      $(document).Toasts('create', {
+        title: 'Toast Title',
+        position: 'bottomLeft',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultAutohide').click(function () {
+      $(document).Toasts('create', {
+        title: 'Toast Title',
+        autohide: true,
+        delay: 750,
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultNotFixed').click(function () {
+      $(document).Toasts('create', {
+        title: 'Toast Title',
+        fixed: false,
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultFull').click(function () {
+      $(document).Toasts('create', {
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        icon: 'fas fa-envelope fa-lg',
+      })
+    });
+    $('.toastsDefaultFullImage').click(function () {
+      $(document).Toasts('create', {
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        image: '../../dist/img/org3-128x128.jpg',
+        imageAlt: 'org Picture',
+      })
+    });
+    $('.toastsDefaultSuccess').click(function () {
+      $(document).Toasts('create', {
+        class: 'bg-success',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultInfo').click(function () {
+      $(document).Toasts('create', {
+        class: 'bg-info',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultWarning').click(function () {
+      $(document).Toasts('create', {
+        class: 'bg-warning',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultDanger').click(function () {
+      $(document).Toasts('create', {
+        class: 'bg-danger',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+    $('.toastsDefaultMaroon').click(function () {
+      $(document).Toasts('create', {
+        class: 'bg-maroon',
+        title: 'Toast Title',
+        subtitle: 'Subtitle',
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+    });
+  });
+</script>

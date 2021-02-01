@@ -1,0 +1,368 @@
+<style type="text/css">
+  /* Chart.js */
+  @keyframes chartjs-render-animation {
+    from {
+      opacity: .99
+    }
+
+    to {
+      opacity: 1
+    }
+  }
+
+  .chartjs-render-monitor {
+    animation: chartjs-render-animation 1ms
+  }
+
+  .chartjs-size-monitor,
+  .chartjs-size-monitor-expand,
+  .chartjs-size-monitor-shrink {
+    position: absolute;
+    direction: ltr;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    pointer-events: none;
+    visibility: hidden;
+    z-index: -1
+  }
+
+  .chartjs-size-monitor-expand>div {
+    position: absolute;
+    width: 1000000px;
+    height: 1000000px;
+    left: 0;
+    top: 0
+  }
+
+  .chartjs-size-monitor-shrink>div {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    left: 0;
+    top: 0
+  }
+</style>
+<!-- Content Wrapper. Contains page content -->
+<div ng-if="logged && user" class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2" style="margin-bottom: -0.5rem!important;width: 100%;margin: auto; ">
+        <div class="col-sm-6" style="margin: auto;">
+          <h1 class="m-0 text-dark">Statistiques</h1>
+        </div><!-- /.col -->
+
+        <div class="col-sm-12 col-md-3 col-lg-3" style="margin-top: 10px;color: aliceblue;">
+          <p class="input-group" style="max-width: 300px">
+            <label style="margin: auto;font-size: xx-large;">Du : </label>
+            <input type="text" class="form-control" readonly uib-datepicker-popup="dd MMMM yyyy"
+              ng-model="vm.Report_Filtre_Du" ng-change="vm.Filter_Dates_Changes()"
+              is-open="vm.Report_Filtre_Du_open" min-date="vm.Report_Filtre_Du" ng-required="true"
+              current-text="Aujourdh'ui" close-text="Fermer" clear-text="Effacer" required>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default"
+                ng-click="vm.Report_Filtre_Du_open = !vm.Report_Filtre_Du_open">
+                <i class="fas fa-calendar-alt"></i>
+              </button>
+            </span>
+          </p>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3" style="margin-top: 10px;color: aliceblue;">
+          <p class="input-group" style="max-width: 300px">
+            <label style="margin: auto;font-size: xx-large;">Au : </label>
+            <input type="text" class="form-control" readonly uib-datepicker-popup="dd MMMM yyyy"
+              ng-model="vm.Report_Filtre_Au" ng-change="vm.Filter_Dates_Changes()"
+              is-open="vm.Report_Filtre_Au_open" min-date="vm.Report_Filtre_Au" ng-required="true"
+              current-text="Aujourdh'ui" close-text="Fermer" clear-text="Effacer" required>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default"
+                ng-click="vm.Report_Filtre_Au_open = !vm.Report_Filtre_Au_open">
+                <i class="fas fa-calendar-alt"></i>
+              </button>
+            </span>
+          </p>
+        </div>
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+  <!-- /.content-header -->
+
+  <!-- Main content -->
+  <section ng-if="permission_reports.can_read" class="content">
+    <div class="container-fluid">
+
+
+      <div class="card">
+        <div class="card-header">
+          <div class="row" style="width: 100%; margin: auto;">
+            <div class="col-sm-12 col-md-3 col-lg-3">
+              <!-- small box -->
+              <div class="small-box bg-hd2">
+                <div class="inner">
+                  <h3 id="nb_patients">{{vm.Statistiques_patients_sexes_ages.patients}}</h3>
+                  <p>Patients consultés</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-person"></i>
+                </div>
+                <a href="#!patients" class="small-box-footer">Détails <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+            <!-- ./col -->
+
+
+            <div class="col-sm-12 col-md-3 col-lg-3">
+              <!-- small box -->
+              <div class="small-box bg-hd1">
+                <div class="inner">
+                  <h3 id="nb_rdvs">{{vm.Statistiques_rdvs.rdvs}}</h3>
+
+                  <p>Rendez-Vous</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-compose"></i>
+                </div>
+                <a href="#!salle_attente" class="small-box-footer">Détails <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+            <!-- ./col -->
+
+
+            <div class="col-sm-12 col-md-3 col-lg-3">
+              <!-- small box -->
+              <div class="small-box  bg-hd3">
+                <div class="inner">
+                  <h3><span id="total_recettes_money">{{vm.Statistiques_Transactions.montant_credits}}</span>DA</h3>
+                  <p>Total Recettes</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-search"></i>
+                </div>
+                <a href="#!caisse" class="small-box-footer">Détails <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-sm-12 col-md-3 col-lg-3">
+              <!-- small box -->
+              <div class="small-box bg-hd4">
+                <div class="inner">
+                  <h3><span id="total_depenses_money">{{vm.Statistiques_Transactions.montant_debits}}</span>DA</h3>
+
+                  <p>Total Dépenses</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-person-add"></i>
+                </div>
+                <a href="#!caisse" class="small-box-footer">Détails <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+            <!-- ./col -->
+
+          </div>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+          <div class="row d-flex justify-content-center">
+            <!--*************** Volet Patient ***************-->
+            <div class="card" style="position: relative; left: 0px; top: 0px;width: 100%;">
+              <div class="card-header ui-sortable-handle" style="cursor: move;">
+                <h3 class="card-title">
+                  <i class="fas fa-chart-pie mr-1"></i>
+                  Statistiques sur les patients : Du : {{vm.Report_Filtre_Du | date : 'dd/MM/yyyy'}} Au :
+                  {{vm.Report_Filtre_Au | date : 'dd/MM/yyyy'}}
+                </h3>
+              </div><!-- /.card-header -->
+              <div class="card-body">
+
+                <div class="row chart tab-pane active" style="width: 100%;">
+
+                  <div class="col-sm-12 col-md-4 col-lg-4">
+                    <p class="text-center">
+                      <strong>Patients consultés par sexes :
+                        <b>{{vm.Statistiques_patients_sexes_ages.patients}}</b></strong>
+                    </p>
+                    <div ng-if="vm.Statistiques_patients_sexes_ages.patients > 0" class="chart-responsive">
+                      <canvas id="chart_patient_par_sexe" height="150"></canvas>
+                    </div>
+                    <div ng-if="vm.Statistiques_patients_sexes_ages.patients  == 0" class="text-center">
+                      <p>Pas de données à afficher</p>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-4 col-lg-4">
+                    <p class="text-center">
+                      <strong>Patients consultés par ages :
+                        <b>{{vm.Statistiques_patients_sexes_ages.patients}}</b></strong>
+                    </p>
+                    <div ng-if="vm.Statistiques_patients_sexes_ages.patients > 0" class="chart-responsive">
+                      <canvas id="chart_patient_par_age" height="150"></canvas>
+                    </div>
+                    <div ng-if="vm.Statistiques_patients_sexes_ages.patients  == 0" class="text-center">
+                      <p>Pas de données à afficher</p>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-4 col-lg-4">
+                    <p class="text-center">
+                      <strong>Evolution mensuelle du nombre de patients consultés</strong>
+                    </p>
+                    <div class="chart-responsive">
+                      <canvas id="chart_evolution_nb_patient" height="150"></canvas>
+                    </div>
+                  </div>
+                </div>
+
+              </div><!-- /.card-body -->
+            </div>
+
+            <div class="card" style="position: relative; left: 0px; top: 0px;width: 100%;">
+
+              <div class="card-body">
+
+                <div class="row chart tab-pane active" style="width: 100%;">
+
+                  <div class="col-sm-12 col-md-4 col-lg-4">
+                    <p class="text-center">
+                      <strong>Evolution mensuelle du nombre de Rendez-Vous :
+                        <b>{{vm.Statistiques_rdvs.rdvs}}</b></strong>
+                    </p>
+                    <div ng-if="vm.Statistiques_rdvs.rdvs > 0" class="chart-responsive">
+                      <canvas id="chart_evolution_nb_rdv" height="150"></canvas>
+                    </div>
+                    <div ng-if="vm.Statistiques_rdvs.rdvs  == 0" class="text-center">
+                      <p>Pas de données à afficher</p>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-12 col-md-4 col-lg-4">
+                    <p class="text-center">
+                      <strong>Total des Rendez-vous : <b>{{vm.Statistiques_rdvs.rdvs}}</b></strong>
+                    </p>
+
+                    <div class="progress-group">
+                      RDV Consultés
+                      <span
+                        class="float-right"><b>{{vm.Statistiques_rdvs.rdv_processed}}</b>/{{vm.Statistiques_rdvs.rdvs}}</span>
+                      <div class="progress progress-sm">
+                        <div class="progress-bar"
+                          style="background-color: #00a84f;width: {{(vm.Statistiques_rdvs.rdv_processed*100)/vm.Statistiques_rdvs.rdvs}}%">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="progress-group">
+                      RDV en Salle d'attente
+                      <span
+                        class="float-right"><b>{{vm.Statistiques_rdvs.rdv_presented}}</b>/{{vm.Statistiques_rdvs.rdvs}}</span>
+                      <div class="progress progress-sm">
+                        <div class="progress-bar"
+                          style="background-color: #6f42c1;width: {{(vm.Statistiques_rdvs.rdv_presented*100)/vm.Statistiques_rdvs.rdvs}}%">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="progress-group">
+                      <span class="progress-text">RDV Confirmés</span>
+                      <span
+                        class="float-right"><b>{{vm.Statistiques_rdvs.rdv_confirmed}}</b>/{{vm.Statistiques_rdvs.rdvs}}</span>
+                      <div class="progress progress-sm">
+                        <div class="progress-bar "
+                          style="background-color: #007dad;width: {{(vm.Statistiques_rdvs.rdv_confirmed*100)/vm.Statistiques_rdvs.rdvs}}%">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="progress-group">
+                      <span class="progress-text">RDV Non Confirmés</span>
+                      <span
+                        class="float-right"><b>{{vm.Statistiques_rdvs.rdv_unconfirmed}}</b>/{{vm.Statistiques_rdvs.rdvs}}</span>
+                      <div class="progress progress-sm">
+                        <div class="progress-bar "
+                          style="background-color: #fd7e14;width: {{(vm.Statistiques_rdvs.rdv_unconfirmed*100)/vm.Statistiques_rdvs.rdvs}}%">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="progress-group">
+                      <span class="progress-text">RDV Annulés</span>
+                      <span
+                        class="float-right"><b>{{vm.Statistiques_rdvs.rdv_cancelled}}</b>/{{vm.Statistiques_rdvs.rdvs}}</span>
+                      <div class="progress progress-sm">
+                        <div class="progress-bar "
+                          style="background-color: #dc3545;width: {{(vm.Statistiques_rdvs.rdv_cancelled*100)/vm.Statistiques_rdvs.rdvs}}%">
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div class="col-sm-12 col-md-4 col-lg-4">
+                    <p class="text-center">
+                      <strong>Durée moyenne des consultations par mois</strong>
+                    </p>
+                    <div class="chart-responsive">
+                      <canvas id="chart_evolution_duree_consultation" height="150"></canvas>
+                    </div>
+                  </div>
+                </div>
+
+              </div><!-- /.card-body -->
+            </div>
+
+            <!--*************** Volet Caisse *************** -->
+            <div class="card" style="position: relative; left: 0px; top: 0px;width: 100%;">
+              <div class="card-header ui-sortable-handle" style="cursor: move;">
+                <h3 class="card-title">
+                  <i class="fas fa-chart-pie mr-1"></i>
+                  Statistiques sur les Recettes/Dépenses : Du : {{ vm.Report_Filtre_Du | date : 'dd/MM/yyyy'}} Au :
+                  {{ vm.Report_Filtre_Au | date : 'dd/MM/yyyy'}}
+                </h3>
+              </div>
+              <div class="card-body">
+
+                <div class="row chart tab-pane active" style="width: 100%;">
+
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <p class="text-center">
+                      <strong>Recettes/Dépenses</strong>
+                    </p>
+                    <div class="chart-responsive">
+                      <canvas id="chart_recettes_depenses" height="150"></canvas>
+                    </div>
+                  </div>
+
+
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <p class="text-center">
+                      <strong>Evolution mensuelle des recettes/dépenses</strong>
+                    </p>
+                    <div class="chart-responsive">
+                      <canvas id="chart_evolution_nb_Transaction" height="150"></canvas>
+                    </div>
+                  </div>
+
+
+                </div>
+
+              </div>
+            </div>
+
+
+          </div>
+          <!-- /.card-body -->
+        </div>
+
+      </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+
+<!-- Control Sidebar -->
+<aside ng-if="logged && user" class="control-sidebar control-sidebar-dark">
+  <!-- Control sidebar content goes here -->
+</aside>
+<!-- /.control-sidebar -->
+<script>
+
+</script>

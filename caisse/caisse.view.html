@@ -1,0 +1,663 @@
+<!-- Content Wrapper. Contains page content -->
+<div ng-if="logged && user" class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <div class="col-sm-4 col-md-4 col-lg-4">
+          <h3 class="text-dark" style="font-size: 1.9rem;">Gestion de la caisse </h3>
+        </div><!-- /.col -->
+        <div class="row col-sm-8 col-md-8 col-lg-8 " style="margin-top: 10px;">
+
+          <a ng-if="permission_patients_transactions.can_create"  class="col-2 align-self-end btn btn-app" data-toggle="modal" data-target="#Add_Transaction_Modal"
+            rel="tooltip" title="Ajouter un nouvelle transaction" data-placement="bottom">
+            <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-plus-square" fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd"
+                d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+              <path fill-rule="evenodd"
+                d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+            </svg> Ajouter une transaction
+          </a>
+          <a ng-if="permission_patients_transactions.can_update" ng-class="{'isDisabled':!vm.Selected_Transaction}" class="col-2 align-self-end btn btn-app"
+            data-toggle="modal" data-target="#Edit_Transaction_Modal" rel="tooltip"
+            title="Modifier la transaction selectionnée" data-placement="bottom"
+            ng-click="vm.Select_Transaction_For_Edit()">
+            <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-pencil-square" fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+              <path fill-rule="evenodd"
+                d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+            </svg> Modifier la transaction
+          </a>
+
+          <a ng-if="permission_patients_transactions.can_read" class="col-2 align-self-end btn btn-app" rel="tooltip" title="Modifier la transaction selectionnée"
+            data-placement="bottom" ng-click="vm.Download_Transactions_Array()">
+            <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-file-earmark-arrow-down" fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M4 0h5.5v1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h1V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2z" />
+              <path d="M9.5 3V0L14 4.5h-3A1.5 1.5 0 0 1 9.5 3z" />
+              <path fill-rule="evenodd"
+                d="M8 6a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 10.293V6.5A.5.5 0 0 1 8 6z" />
+            </svg> Télécharger
+          </a>
+        </div>
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+  <!-- /.content-header -->
+  <!--*********************** Table des Transactions ******************************-->
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+
+      <!-- Main row -->
+      <div class="row" style="width: 100%;">
+        <div class="card card col-sm-12 col-md-12">
+          <div ng-show="vm.showHelp" class="alert alert-warning alert-dismissible"
+            style="max-width: 95%; margin: auto;">
+            <button type="button" class="close" ng-click="vm.showHelp=!vm.showHelp">×</button>
+            <span ng-show="vm.showHelp" class="fnl_help">?</span>
+            <h6 style="margin: auto;">
+              <span class="badge bg-dark ng-binding">1</span> Créer une liste <svg class="bi bi-arrow-right" width="1em"
+                height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd"
+                  d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
+                  clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
+                  clip-rule="evenodd" />
+              </svg> <span class="badge bg-dark ng-binding">2</span> Importer/Traiter les transactions
+              <svg class="bi bi-arrow-right" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd"
+                  d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z"
+                  clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z"
+                  clip-rule="evenodd" />
+              </svg> <span class="badge bg-dark ng-binding">3</span> Valider la liste.
+            </h6>
+
+          </div>
+          <!-- /.card-header -->
+          <!-- Main content -->
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            </br>
+            <ng-container ng-if="permission_patients_transactions.can_read">
+              <!-- mainTable -->
+              <div class="row " style="width: 100%;">
+                <div class="col-sm-6 col-md-6 col-lg-6" rel="tooltip" title="Rechercher une transaction"
+                  data-placement="bottom">
+                  <input type="text" class="form-control" placeholder="Recherche transaction..."
+                    ng-model="vm.filterTextMainTable">
+                </div>
+                <div class="col-sm-3 col-md-3 col-lg-3">
+                  <p class="input-group" style="max-width: 300px">
+                    <label style="margin: auto;font-size: xx-large;">Du : </label><input type="text"
+                      class="form-control" readonly uib-datepicker-popup="dd MMMM yyyy"
+                      ng-model="vm.Transaction_Filtre_Du" ng-change="vm.Filter_Dates_Changes()"
+                      is-open="vm.Transaction_Filtre_Du_open" min-date="vm.Transaction_Filtre_Du" ng-required="true"
+                      current-text="Aujourdh'ui" close-text="Fermer" clear-text="Effacer" required>
+                    <span class="input-group-btn">
+                      <button  ng-if="permission_patients_transactions.can_delete" type="button" class="btn btn-default"
+                        ng-click="vm.Transaction_Filtre_Du_open = !vm.Transaction_Filtre_Du_open">
+                        <i class="fas fa-calendar-alt"></i>
+                      </button>
+                    </span>
+                  </p>
+                </div>
+                <div class="col-sm-3 col-md-3 col-lg-3">
+                  <p class="input-group" style="max-width: 300px">
+                    <label style="margin: auto;font-size: xx-large;">Au : </label><input type="text"
+                      class="form-control" readonly uib-datepicker-popup="dd MMMM yyyy"
+                      ng-model="vm.Transaction_Filtre_Au" ng-change="vm.Filter_Dates_Changes()"
+                      is-open="vm.Transaction_Filtre_Au_open" min-date="vm.Transaction_Filtre_Au" ng-required="true"
+                      current-text="Aujourdh'ui" close-text="Fermer" clear-text="Effacer" required>
+                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-default"
+                        ng-click="vm.Transaction_Filtre_Au_open = !vm.Transaction_Filtre_Au_open">
+                        <i class="fas fa-calendar-alt"></i>
+                      </button>
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <div class="row " style="width: 100%;border-style: groove;margin: auto;padding: 15px;">
+                <div class="col-sm-12 col-md-3 col-lg-3" style="color: violet;">
+                  <label style="font-size: x-large;margin-bottom: -2px;">Nombre de transactions</label>
+                  <b> <input type="text" class="form-control masked_money"
+                      style="font-size: 36px;font-weight: bolder;    font-family: monospace;"
+                      value="{{vm.dataMainTable.length}}" disabled=""></b>
+                </div>
+                <div class="col-sm-12 col-md-3 col-lg-3" style="color: green;" rel="tooltip" data-placement="bottom"
+                  title="La somme des montants crédités">
+                  <label style="font-size: x-large;margin-bottom: -2px;">Total Versements</label>
+                  <b><input type="text" class="form-control masked_money"
+                      style="font-size: 36px;font-weight: bolder;    font-family: monospace;"
+                      value="{{StringToMoney(Calculate_Sum_Array(vm.dataMainTable | filter: {operation: 'credit'}))}}DA"
+                      disabled=""></b>
+                </div>
+                <div class="col-sm-12 col-md-3 col-lg-3" style="color: red;" rel="tooltip" data-placement="bottom"
+                  title="La somme des montants débités">
+                  <label style="font-size: x-large;margin-bottom: -2px;">Total Paiements</label>
+                  <b> <input type="text" class="form-control masked_money"
+                      style="font-size: 36px;font-weight: bolder;    font-family: monospace;"
+                      value="{{StringToMoney(Calculate_Sum_Array(vm.dataMainTable | filter: {operation: 'debit'}))}}DA"
+                      disabled=""></b>
+                </div>
+                <div class="col-sm-12 col-md-3 col-lg-3" style="color: orange;">
+                  <label style="font-size: x-large;margin-bottom: -2px;">Solde</label>
+                  <b> <input type="text" class="form-control masked_money"
+                      style="font-size: 36px;font-weight: bolder;    font-family: monospace;"
+                      value="{{StringToMoney((Calculate_Sum_Array(vm.dataMainTable | filter: {operation: 'credit'}))+(Calculate_Sum_Array(vm.dataMainTable | filter: {operation: 'debit'})))}}DA"
+                      disabled=""></b>
+                </div>
+              </div>
+              <div class="table-responsive tableFixHead p-0" vm.controlled>
+                <table id="TransactionsTable"
+                  class="table table-striped table-bordered table-hover table-head-fixed text-nowrap"
+                  data-pagination="true" data-side-pagination="server" data-total-field="count"
+                  style="text-align: center;">
+                  <thead>
+                    <tr>
+                      <th ng-repeat="label in labelsMainTable">
+                        <a ng-click="vm.sortColumnMainTable(label)">
+                          <span class="text-uppercase">{{label}}</span>
+                          <span ng-if="orderByFieldtransactionsTable == label">
+                            <span ng-if="!sortByDescendingMainTable">
+                              <i class="fas fa-angle-up"></i>
+                            </span>
+                            <span ng-if="sortByDescendingMainTable">
+                              <i class="fas fa-angle-down"></i>
+                            </span>
+                          </span>
+                        </a>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-click="vm.add2selectionMainTable(transaction,$index)"
+                      ng-repeat="transaction in vm.dataMainTable = (vm.All_Transactions | filter: vm.filterTextMainTable | orderBy : orderByFieldMainTable : sortByDescendingMainTable) | limitTo:itemsPerPageMainTable:itemsPerPageMainTable*(currentPageMainTable-1) track by $index"
+                      ng-class="{ 'table-info': vm.selected_row === transaction.id } ">
+                      <td>
+                        <div class="d-flex justify-content-center align-self-center custom-control custom-radio">
+                          <input id="customRadiobox2{{transaction.id}}" class="custom-control-input" type="radio"
+                            name="customRadio" ng-checked="vm.selected_row===transaction.id">
+                          <label for="customRadiobox2{{transaction.id}}" class="custom-control-label"></label>
+                        </div>
+                      </td>
+                      <td>{{transaction.id}}</td>
+                      <td
+                        ng-class="{ 'debit': transaction.operation === 'debit','credit': transaction.operation === 'credit'}">
+                        {{transaction.operation.toUpperCase()}}</td>
+                      <td>{{transaction.type_transaction}}</td>
+                      <td>{{transaction.tiers}}</td>
+                      <td>{{transaction.type_paiement}}</td>
+                      <td>{{transaction.date_transaction | date:'dd-MM-yyyy HH:MM'}}</td>
+                      <td><b><span ng-if="transaction.montant>0">+</span>{{StringToMoney(transaction.montant)}}DA</b>
+                      </td>
+                      <td>{{transaction.createdby}}</td>
+                      <td>
+                        <button class="btn btn-danger" ng-click="vm.Delete_Transaction(transaction.id,$index)"
+                          title="Cliquez pour supprimer" data-toggle="tooltip"><i class="far fa-trash-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+
+                </table>
+              </div>
+              <div class="row">
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <p>Total : {{vm.dataMainTable.length}} </p>
+                </div>
+                <div class="col-sm-4 col-md-4 col-lg-4"></div>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                  <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+                    <label class="btn btn-outline-dark ">
+                      <input type="radio" name="optionsMainTable" id="option1MainTable"
+                        ng-click="itemsPerPageMainTable=3" autocomplete="off"> 3
+                    </label>
+                    <label class="btn btn-outline-dark">
+                      <input type="radio" name="optionsMainTable" id="option2MainTable"
+                        ng-click="itemsPerPageMainTable=5" autocomplete="off"> 5
+                    </label>
+                    <label class="btn btn-outline-dark active">
+                      <input type="radio" name="optionsMainTable" id="option3MainTable"
+                        ng-click="itemsPerPageMainTable=10" autocomplete="off" checked=""> 10
+                    </label>
+                    <label class="btn btn-outline-dark">
+                      <input type="radio" name="optionsMainTable" id="option4MainTable"
+                        ng-click="itemsPerPageMainTable=20" autocomplete="off">
+                      20
+                    </label>
+                    <label class="btn btn-outline-dark">
+                      <input type="radio" name="optionsMainTable" id="option5MainTable"
+                        ng-click="itemsPerPageMainTable=50" autocomplete="off">
+                      50
+                    </label>
+                    <label class="btn btn-outline-dark">
+                      <input type="radio" name="optionsMainTable" id="option6MainTable"
+                        ng-click="itemsPerPageMainTable=100" autocomplete="off">
+                      100
+                    </label>
+
+                  </div>
+                </div>
+              </div>
+              <!-- <ul class="d-flex justify-content-center" uib-pagination previous-text='<<' next-text='>>'
+                  total-items="vm.dataMainTable.length" items-per-page="itemsPerPageMainTable" ng-model="currentPageMainTable"
+                  max- boundary-link-numbers="3" ng-change="vm.pageChangedMainTable()"></ul>
+                -->
+              <ul id="TransactionsTablePagination" class="pagination pg-red float-center d-flex justify-content-center"
+                total-items="vm.dataMainTable.length" ng-model="currentPageMainTable" max-size="maxSizePageMainTable"
+                boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPageMainTable"
+                uib-pagination first-text='<<<' previous-text='<<' next-text='>>' last-text='>>>'></ul>
+
+
+            </ng-container>
+          </div>
+          <!-- END Main content -->
+
+          <!-- /.card-body -->
+        </div>
+      </div>
+      <!-- /.row (main row) -->
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<!--------------------------- Ajouter Transaction Modal ---------------------------------------->
+<div ng-if="permission_patients_transactions.can_create" class="modal fade show" id="Add_Transaction_Modal" style="display: none;" aria-modal="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h4 class="modal-title">
+          <i class="fas fa-money-bill-wave"></i> Ajouter une nouvelle transaction
+        </h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="card card-warning">
+          <!-- /.card-header -->
+          <div class="card-body">
+            <form id="Add_Transaction_Form" name="Add_Transaction_Form"
+              ng-submit="vm.Add_Transaction(Add_Transaction_Form.$valid,New_Transaction,'#Add_Transaction_Modal')"
+              role="form">
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label><i class="fas fa-clock"></i>Effectué le</label>
+                    <input type="datetime-local" class="form-control" id="Selected_Transaction_Date"
+                      style="border-color: #343a40;" name="Selected_Transaction_Date"
+                      ng-model="New_Transaction.date_transaction"
+                      ng-class="{ 'is-invalid' : Add_Transaction_Form.Selected_Transaction_Date.$invalid }" required>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="types"><i class="fas fa-hand-holding-usd"></i>
+                      Type de la transaction
+                      <button type="button" class="close float-right" style="color: green;font-size: 12px;"
+                        ng-click="Upload_Static_Table_To_Modal('types_transactions',types_transactions);"
+                        data-toggle="modal" data-target="#Static_Table_Modal" rel="tooltip"
+                        title="Ajouter un nouvelle type de versement" data-placement="bottom">
+                        <span aria-hidden="true"><i class="fas fa-plus-circle"></i></span>
+                      </button>
+                    </label>
+                    <select id="static_table_box_types" name="static_table_box_types" class="form-control"
+                      style="border-color: #343a40;" ng-model="vm.Selected_Type_Transaction" ng-change=""
+                      ng-options="item.designation for item in types_transactions" required>
+                    </select>
+                  </div>
+                </div>
+
+                <div ng-show="vm.Selected_Type_Transaction.cible === 'patient' " class="col-sm-12 col-md-12 col-lg-12">
+                  <label><i class="fas fa-bullseye"></i> Patient
+                  </label>
+                  <div class="form-group" data-toggle="tooltip" data-placement="top"
+                    title="Uniquement les patients dont le résultat de contrôle a été négatif seront affichés">
+                    <select name="Add_Transaction_Patient" class="form-control select2 select2-hidden-accessible"
+                      style="width: 100%;" data-select2-id="2" tabindex="-1" aria-hidden="true"
+                      ng-model="vm.CurrentPatient" ng-change="vm.SelectPatientForTransaction(vm.CurrentPatient);"
+                      style="border-color: #343a40;">
+                      <option value="">Selectionnez un patient</option>
+                      <option ng-repeat="patient in All_Patients track by patient.id" value="{{patient}}">
+                        {{patient.lib}}
+                      </option>
+                    </select>
+                    <span style="color:red"
+                      ng-if="Add_Transaction_Form.Add_Transaction_Patient.$dirty && Add_Transaction_Form.Add_Transaction_Patient.$error.required"
+                      class="help-block">Attention : le patient est obligatoire</span>
+                  </div>
+                  <!-- /.form-group -->
+                </div>
+
+                <div ng-show="vm.Selected_Type_Transaction.cible === 'partenaire'" class="col-sm-12">
+                  <div class="form-group">
+                    <label for="types"><i class="far fa-handshake"></i>
+                      Partenaire <button type="button" class="close float-right" style="color: green;font-size: 12px;"
+                        ng-click="Upload_Static_Table_To_Modal('partenaires',partenaires);" data-toggle="modal"
+                        data-target="#Static_Table_Modal" rel="tooltip" title="Ajouter un partenaire"
+                        data-placement="bottom">
+                        <span aria-hidden="true"><i class="fas fa-plus-circle"></i></span>
+                      </button>
+                    </label>
+                    <select id="static_table_box_types" name="static_table_box_types" class="form-control"
+                      style="border-color: #343a40;" ng-model="vm.Selected_Partenaire" ng-change=""
+                      ng-options="item.designation for item in partenaires" required>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="inputSuccess"><i class="fas fa-wallet"></i>
+                      Montant à verser</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control masked_money" style="border-color: #343a40;"
+                        name="Selected_Transaction_Montant" placeholder="0.00" ng-model="New_Transaction.montant"
+                        ng-class="{ 'is-invalid' : Add_Transaction_Form.Selected_Transaction_Montant.$invalid }"
+                        required>
+                      <div class="input-group-append">
+                        <span class="input-group-text" style="border-color: #343a40;">DA</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="types"><i class="fas fa-hand-holding-usd"></i>
+                      Type de paiement
+                      <button type="button" class="close float-right" style="color: green;font-size: 12px;"
+                        ng-click="Upload_Static_Table_To_Modal('types_paiements',types_paiements);" data-toggle="modal"
+                        data-target="#Static_Table_Modal" rel="tooltip" title="Ajouter un nouvelle type de versement"
+                        data-placement="bottom">
+                        <span aria-hidden="true"><i class="fas fa-plus-circle"></i></span>
+                      </button>
+                    </label>
+                    <select id="static_table_box_types" name="static_table_box_types" class="form-control"
+                      style="border-color: #343a40;" ng-model="vm.Selected_Type_Paiement" ng-change=""
+                      ng-options="item.designation for item in types_paiements" required>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label><i class="fas fa-clipboard"></i> Observations</label>
+                    <textarea class="form-control" rows="3" name="Selected_Transaction_Observation"
+                      style="border-color: #343a40;" ng-model="New_Transaction.observation"
+                      placeholder="Exemple : N° et date de la facture...etc"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-footer" style="background-color: white;">
+                <button type="submit" class="btn btn-primary float-right" title="Cliquez pour Ajouter un Transaction"
+                  data-toggle="tooltip">Ajouter</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--------------------------- Editer Fiche Transaction Modal ---------------------------------------->
+<div ng-if="permission_patients_transactions.can_update" class="modal fade show" id="Edit_Transaction_Modal" style="display: none;" aria-modal="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h4 class="modal-title">
+          <i class="fas fa-money-bill-wave"></i> Modifier la transaction {{vm.Selected_Transaction.id}}
+        </h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="card card-warning">
+          <!-- /.card-header -->
+          <div class="card-body">
+            <form id="Edit_Transaction_Form" name="Edit_Transaction_Form"
+              ng-submit="vm.Edit_Transaction(Edit_Transaction_Form.$valid,vm.Selected_Transaction,'#Edit_Transaction_Modal')"
+              role="form">
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label><i class="fas fa-clock"></i>Effectué le</label>
+                    <input type="datetime-local" class="form-control" id="Selected_Transaction_Date"
+                      style="border-color: #343a40;" name="Selected_Transaction_Date"
+                      ng-model="vm.Selected_Transaction.date_transaction"
+                      ng-class="{ 'is-invalid' : Edit_Transaction_Form.Selected_Transaction_Date.$invalid }" required>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="types"><i class="fas fa-hand-holding-usd"></i>
+                      Type de la transaction
+                      <button type="button" class="close float-right" style="color: green;font-size: 12px;"
+                        ng-click="Upload_Static_Table_To_Modal('types_transactions',types_transactions);"
+                        data-toggle="modal" data-target="#Static_Table_Modal" rel="tooltip"
+                        title="Ajouter un nouvelle type de versement" data-placement="bottom">
+                        <span aria-hidden="true"><i class="fas fa-plus-circle"></i></span>
+                      </button>
+                    </label>
+                    <select id="static_table_box_types" name="static_table_box_types" class="form-control"
+                      style="border-color: #343a40;" ng-model="vm.Selected_Transaction.type_transaction_id"
+                      ng-options="item.id as item.designation for item in types_transactions" disabled required>
+                    </select>
+                  </div>
+                </div>
+                <div ng-show="vm.Selected_Transaction.patient_id" class="col-sm-12 col-md-12 col-lg-12">
+                  <label><i class="fas fa-bullseye"></i> Patient
+                  </label>
+                  <div class="form-group" data-toggle="tooltip" data-placement="top"
+                    title="Uniquement les patients dont le résultat de contrôle a été négatif seront affichés">
+                    <select id="Edit_Transaction_Patient" name="Edit_Transaction_Patient" class="form-control"
+                      style="border-color: #343a40;" ng-model="vm.Selected_Transaction.patient_id" ng-change=""
+                      ng-options="item.id as item.lib for item in All_Patients" required>
+                    </select>
+                    <span style="color:red"
+                      ng-if="Edit_Transaction_Form.Edit_Transaction_Patient.$dirty && Edit_Transaction_Form.Edit_Transaction_Patient.$error.required"
+                      class="help-block">Attention : le patient est obligatoire</span>
+                  </div>
+                  <!-- /.form-group -->
+                </div>
+
+                <div ng-show="vm.Selected_Transaction.partenaire_id" class="col-sm-12">
+                  <div class="form-group">
+                    <label for="types"><i class="far fa-handshake"></i>
+                      Partenaire <button type="button" class="close float-right" style="color: green;font-size: 12px;"
+                        ng-click="Upload_Static_Table_To_Modal('partenaires',partenaires);" data-toggle="modal"
+                        data-target="#Static_Table_Modal" rel="tooltip" title="Ajouter un partenaire"
+                        data-placement="bottom">
+                        <span aria-hidden="true"><i class="fas fa-plus-circle"></i></span>
+                      </button>
+                    </label>
+                    <select id="static_table_box_types" name="static_table_box_types" class="form-control"
+                      style="border-color: #343a40;" ng-model="vm.Selected_Transaction.partenaire_id" ng-change=""
+                      ng-options="item.id as item.designation for item in partenaires" required>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="inputSuccess"><i class="fas fa-wallet"></i>
+                      Montant à verser</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control masked_money" style="border-color: #343a40;"
+                        name="Selected_Transaction_Montant" placeholder="0.00"
+                        ng-model="vm.Selected_Transaction.montant"
+                        ng-class="{ 'is-invalid' : Edit_Transaction_Form.Selected_Transaction_Montant.$invalid }"
+                        required>
+                      <div class="input-group-append">
+                        <span class="input-group-text" style="border-color: #343a40;">DA</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="types"><i class="fas fa-hand-holding-usd"></i>
+                      Type de paiement
+                      <button type="button" class="close float-right" style="color: green;font-size: 12px;"
+                        ng-click="Upload_Static_Table_To_Modal('types_paiements',types_paiements);" data-toggle="modal"
+                        data-target="#Static_Table_Modal" rel="tooltip" title="Ajouter un nouvelle type de versement"
+                        data-placement="bottom">
+                        <span aria-hidden="true"><i class="fas fa-plus-circle"></i></span>
+                      </button>
+                    </label>
+                    <select id="static_table_box_types" name="static_table_box_types" class="form-control"
+                      style="border-color: #343a40;" ng-model="vm.Selected_Transaction.type_paiement_id" ng-change=""
+                      ng-options="item.id as item.designation for item in types_paiements" required>
+                    </select>
+                  </div>
+                </div>
+
+
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label><i class="fas fa-clipboard"></i> Observations</label>
+                    <textarea class="form-control" rows="3" name="Selected_Transaction_Observation"
+                      style="border-color: #343a40;" ng-model="vm.Selected_Transaction.observation"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-footer" style="background-color: white;">
+                <button type="submit" class="btn btn-primary float-right" title="Cliquez pour Ajouter un Transaction"
+                  data-toggle="tooltip">Modifier</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--*********************** Static Tables Modal ******************************-->
+<div ng-if="permission_static_tables.can_create" class="modal fade show" id="Static_Table_Modal" style="display: none;  z-index: 10000000 !important;"
+  aria-modal="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h4 class="modal-title">
+          <i class="fas fa-bars"></i>
+          Table : {{Selected_Static_Table_Name}}
+        </h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="card card-warning">
+          <!-- /.card-header -->
+          <div class="card-body">
+            <form role="form" id="Static_Table_Form" name="Static_Table_Form">
+              <div class="row" style="width:100%">
+                <div class="input-group col-10" rel="tooltip" title="Rechercher une demande de contrôle"
+                  data-placement="bottom">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><svg class="bi bi-search" width="1em" height="1em"
+                        viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                          d="M10.442 10.442a1 1 0 011.415 0l3.85 3.85a1 1 0 01-1.414 1.415l-3.85-3.85a1 1 0 010-1.415z"
+                          clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                          d="M6.5 12a5.5 5.5 0 100-11 5.5 5.5 0 000 11zM13 6.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
+                          clip-rule="evenodd" />
+                      </svg></span>
+                  </div>
+                  <input type="text" class="form-control" style="height: 100%;" placeholder="Filtre..."
+                    ng-model="vm.Static_Table_Filtre">
+                </div>
+                <button class="btn btn-lg btn-warning col-2" ng-click="Add_New_Object2Static_Table()"
+                  title="Cliquez pour Ajouter {{Selected_Static_Table_Name}}" data-toggle="tooltip"><i
+                    class="fas fa-plus"></i></button>
+              </div>
+
+              <div class="box-body table-responsive no-padding" style="max-height: 300px;">
+                <table class="table table-hover">
+                  <tbody>
+                    <thead>
+                      <tr>
+                        <th ng-repeat="label in Selected_Static_Table_Labels">
+                          <a>
+                            <span class="text-uppercase">{{label}}</span>
+                          </a>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tr style="cursor: pointer;"
+                      ng-repeat="ligne in dataTable = (Selected_Static_Table_Array | filter: vm.Static_Table_Filtre) track by $index"
+                      ng-click="Select_Row_Static_Table(Selected_Static_Table_Name,ligne,$index);"
+                      ng-class="{ 'table-info': Static_Table_Selected_Row.id === ligne.id }">
+                      <td>
+                        {{ligne.id}}
+                      </td>
+                      <td>
+                        <input class="form-control" type="text" name="Static_Table_Designation{{$index}}"
+                          ng-model="ligne.designation" minlength="2" placeholder="Entrer une designation{{$index}} ..."
+                          ng-change="ligne.has_changed = true" required />
+                      </td>
+                      <td ng-if="Selected_Static_Table_Name==='actes'">
+                        <select class="form-control" ng-model="ligne.procedure_id" ng-change="ligne.has_changed = true">
+                          <option ng-repeat="item in procedures" ng-value="item.id">
+                            {{item.designation}}
+                          </option>
+                        </select>
+                      </td>
+                      <td ng-if="Selected_Static_Table_Name==='actes'">
+                        <input type="text" class="form-control masked_money" placeholder="0.00" ng-model="ligne.montant"
+                          ng-change="ligne.has_changed = true">
+                      </td>
+                      <td ng-if="Selected_Static_Table_Name==='types_transactions'">
+                        <select class="form-control" ng-model="ligne.operation" ng-change="ligne.has_changed = true">
+                          <option  value="credit">Crédit (+)</option>
+                          <option  value="debit">Débit (-)</option>
+                        </select>
+                      </td>
+                      <td ng-if="Selected_Static_Table_Name==='types_transactions'">
+                        <select class="form-control" ng-model="ligne.cible" ng-change="ligne.has_changed = true">
+                          <option value="patient">Patient</option>
+                          <option value="partenaire">Partenaire</option>
+                        </select>
+                      </td>
+                      <td>
+                        <button ng-if="!ligne.id" class="btn btn-warning"
+                          ng-click="Add_Static_Table(Selected_Static_Table_Name,ligne,$index)"
+                          title="Cliquez pour enregistrer" data-toggle="tooltip"><i class="fas fa-save"></i>
+                        </button>
+
+                        <button ng-if="ligne.id && ligne.has_changed" class="btn btn-success"
+                          ng-click="Edit_Static_Table(Selected_Static_Table_Name,ligne,$index);ligne.has_changed = false;"
+                          title="Cliquez pour modifier" data-toggle="tooltip"><i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger"
+                          ng-click="Delete_Static_Table(Selected_Static_Table_Name,ligne,$index)"
+                          ng-if="!(Selected_Static_Table_Name==='types_transactions' &&  ligne.id===1)"
+                          title="Cliquez pour supprimer" data-toggle="tooltip"><i class="far fa-trash-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer ">
+            <button type="button" class="btn btn-lg btn-success " data-dismiss="modal">ok</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="../app-content/js/xlsx.full.min.js"></script>

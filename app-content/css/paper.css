@@ -1,0 +1,34 @@
+
+/** Paper sizes **/
+.A5           .sheet { width: 148mm; height: 209mm }
+ 
+/** Padding area **/
+.sheet.padding-10mm { padding: 10mm }
+
+
+/** For screen preview **/
+@media screen {
+  .sheet {
+    box-shadow: 0 .5mm 2mm rgba(0,0,0,.3);
+    margin: auto;
+  }
+}
+
+/** Fix for Chrome issue #273306 **/
+@media print {        
+  .A5                    { width: 148mm;margin: auto; }
+  @page {
+    size: A5;
+   /* margin: 30mm 45mm 30mm 45mm; 
+      change the margins as you want them to be. */
+    margin: auto; 
+     text-align: center;
+     width: auto; 
+     border: 0; 
+     padding: 0; 
+     float: none !important; 
+  }
+  .hidden-print {
+    display: none !important;
+  }
+}

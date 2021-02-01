@@ -1,0 +1,1117 @@
+<div ng-if="logged && user" class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2" style="margin-bottom: -0.5rem!important; ">
+                <div class="col-sm-6" style="margin: auto;">
+                    <h1 class="text-dark">Paramètres Générales</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6 ">
+
+                </div>
+                <!-- /.row -->
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+    <br>
+    <!-- Main content -->
+    <section class="content" style="width: 90%;margin: auto;">
+        <div class="card card-primary card-outline">
+
+            <div class="card-body">
+
+                <div class="row" style="width: 100%;margin: auto;">
+                    <div class="col-sm-12 col-md-2 col-lg-2">
+                        <div class="nav flex-column nav-tabs h-100" id="vert-tabs-tab" role="tablist"
+                            aria-orientation="vertical" ng-init="vm.Selected_param = 'compte'">
+                            <a ng-if="permission_compte.can_read" class="nav-link active" id="tab_compte"
+                                data-toggle="tab" href="" role="tab" aria-controls="tab_compte"
+                                ng-class="{'active' : vm.Selected_param === 'compte'}"
+                                aria-selected="{vm.Selected_param === 'compte'}"
+                                ng-click="vm.Selected_param = 'compte'"><i class="far fa-address-card"></i> Compte</a>
+                            <a ng-if="permission_clinique.can_read" class="nav-link" id="tab_clinique" data-toggle="tab"
+                                href="" role="tab" aria-controls="tab_clinique"
+                                ng-class="{'active' : vm.Selected_param === 'clinique'}"
+                                aria-selected="{vm.Selected_param === 'clinique'}"
+                                ng-click="vm.Selected_param = 'clinique'"><i class="far fa-building"></i> Clinique</a>
+                            <a ng-if="permission_utilisateurs.can_read" class="nav-link" id="tab_utilisateurs"
+                                data-toggle="tab" href="" role="tab" aria-controls="tab_utilisateurs"
+                                ng-class="{'active' : vm.Selected_param === 'utilisateurs'}"
+                                aria-selected="{vm.Selected_param === 'utilisateurs'}"
+                                ng-click="vm.Selected_param = 'utilisateurs'"><i class="fas fa-users"></i>
+                                Utilisateurs</a>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="col-sm-12 col-md-10 col-lg-10" style="    border: groove;padding: 20px;">
+                        <div class="tab-content">
+
+                            <div ng-if="license.F6 && permission_compte.can_read" class="tab-pane text-left fade"
+                                id="tab_compte" role="tabpanel"
+                                ng-class="{'active' : vm.Selected_param === 'compte','show': vm.Selected_param === 'compte'}"
+                                aria-labelledby="tab_compte">
+                                <form name="form_compte" ng-submit="vm.updateUser(avatar_document)" role="form">
+                                    <div class="custom-control custom-switch" style="float:right"
+                                        ng-class="{'custom-switch-off-success':user.active,'custom-switch-off-danger':!user.active }">
+                                        <input class="custom-control-input" type="checkbox" id="customCheckbox2"
+                                            ng-model="user.active">
+                                        <label for="customCheckbox2" class="custom-control-label">Compte actif ?</label>
+                                    </div>
+
+                                    <div class="row" style="width: 100%;">
+                                        <div class="col-sm-6">
+                                            <!-- select -->
+                                            <div class="form-group">
+                                                <label>Clinique</label>
+                                                <select class="form-control" name="organisme_compte"
+                                                    ng-model="user.org_id"
+                                                    ng-options="org.id as org.designation for org in orgs" disabled
+                                                    required>
+                                                    <option value=""></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Profession
+                                                    <button type="button" class="close float-right"
+                                                        style="color: green;font-size: 12px;"
+                                                        ng-click="Upload_Static_Table_To_Modal('org_professions',org_professions)"
+                                                        data-toggle="modal" data-target="#Static_Table_Modal"
+                                                        rel="tooltip" title="Ajouter un nouveau type de radiogaphie"
+                                                        data-placement="bottom">
+                                                        <span aria-hidden="true"><i
+                                                                class="fas fa-plus-circle"></i></span>
+                                                    </button>
+                                                </label>
+                                                <select class="form-control" name="direction_compte"
+                                                    ng-model="user.org_profession_id"
+                                                    ng-options="org_prof.id as org_prof.designation for org_prof in org_professions"
+                                                    required>
+                                                    <option value=""></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" style="width: 100%;">
+                                        <div class="col-sm-6 form-group">
+                                            <label>Civilité : </label>
+
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" ng-model="user.gender"
+                                                    name="civilite_compte" value="M" required>
+                                                <label class="form-check-label">Monsieur</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" ng-model="user.gender"
+                                                    name="civilite_compte" value="F" required>
+                                                <label class="form-check-label">Madame</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6 form-group">
+                                            <label>Sexe</label>
+                                            <select class="form-control"
+                                                style="width: auto; height: auto; padding: auto;" ng-model="user.gender"
+                                                placeholder="Enter le sexe..." required>
+                                                <option value=""></option>
+                                                <option ng-repeat="sexe in sexes" value="{{sexe.id}}">
+                                                    {{sexe.designation}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <!-- text input -->
+                                            <div class="form-group">
+                                                <label>Nom</label>
+                                                <input type="text" ng-model="user.fname" class="form-control"
+                                                    placeholder="Enter ..." name="nom_compte" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Prénom</label>
+                                                <input type="text" ng-model="user.lname" class="form-control"
+                                                    placeholder="Enter ..." name="prenom_compte" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="input-group "
+                                                ng-class="{ 'has-error': form_compte.email_compte.$dirty && form_compte.email_compte.$error.required }">
+                                                <input type="email" class="form-control" placeholder="Email"
+                                                    name="email_compte" id="email_compte" ng-model="user.email"
+                                                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required />
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text">
+                                                        <span class="fas fa-envelope"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="input-group"
+                                                ng-class="{ 'has-error': form_compte.password.$dirty && form_compte.password_compte.$error.required }">
+                                                <input type="password" name="password_compte"
+                                                    autocomplete="votre mot de passe" placeholder="Mot de passe"
+                                                    id="password_compte" class="form-control" ng-model="user.password"
+                                                    minlength="5" ng-change="vm.validatePassword()" required />
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text">
+                                                        <span class="fas fa-lock"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+
+                                            <div class="input-group"
+                                                ng-class="{ 'has-error': form_compte.repassword_compte.$dirty && form_compte.repassword_compte.$error.required }">
+                                                <input type="password" name="repassword_compte"
+                                                    autocomplete="votre mot de passe"
+                                                    placeholder="retapez votre Mot de passe" id="repassword_compte"
+                                                    class="form-control" ng-model="user.repassword"
+                                                    ng-keyup="vm.validatePassword()" minlength="5" required />
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text">
+                                                        <span class="fas fa-lock"></span>
+                                                    </div>
+                                                </div>
+                                                <p ng-if="user.password != user.repassword" style="color:red">
+                                                    Les deux mots
+                                                    de
+                                                    passes
+                                                    ne
+                                                    sont pas
+                                                    identiques</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row" style="width: 100%;margin-top: 10px;">
+                                        <div class="col-sm-6">
+                                            <label style="margin-right: 5px;">Charger image</label>
+                                            <div class="">
+                                                <div class="custom-file">
+                                                    <input id="avatar_document" name="avatar_document" type="file"
+                                                        file-model="avatar_document" accept="image/*"
+                                                        class="custom-file-input" data-toggle="tooltip"
+                                                        data-placement="top"
+                                                        title="Cliquer ici pour choisir la avatar à charger">
+                                                    <label class="custom-file-label" for="avatar_document">Charger la
+                                                        avatar</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6 text-center">
+
+                                            <img ng-src="{{user_avatar_url}}" alt="avatar" class="brand-image col-6"
+                                                style="opacity: .8;margin: 30px;">
+                                            <p>Avatar actuel</p>
+                                        </div>
+
+                                    </div>
+
+                                    </br>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <button ng-if="permission_compte.can_update" type="submit"
+                                                class="btn btn-success btn-block">Mettre à
+                                                jour mon
+                                                compte</button>
+                                            <img ng-if="vm.dataLoading"
+                                                src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                                        </div>
+                                        <!-- /.col -->
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div ng-if="license.F7 && permission_clinique.can_read" class="tab-pane fade"
+                                id="tab_clinique" role="tabpanel"
+                                ng-class="{'active' : vm.Selected_param === 'clinique','show': vm.Selected_param === 'clinique'}"
+                                aria-labelledby="tab_clinique">
+                                <form name="form_clinique"
+                                    ng-submit="vm.update_clinique(form_clinique.$valid,logo_document,background_document)"
+                                    role="form">
+                                    <div class="row" style="width: 100%;">
+                                        <div class="col-sm-12 col-md-12 col-lg-12">
+                                            <div class="form-group">
+                                                <label>Clinique</label>
+                                                <input type="text" ng-model="org.designation" class="form-control"
+                                                    placeholder="Enter ..." name="nom_clinique" disabled required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Adresse</label>
+                                                <div class="">
+                                                    <input type="text" ng-model="org.adresse" class="form-control"
+                                                        placeholder="Enter adresse..." />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Wilaya</label>
+                                                <select class="form-control"
+                                                    ng-options="wilaya.id as wilaya.designation for wilaya in wilayas"
+                                                    ng-model="org.wilaya_id" placeholder="Enter wilaya..." required>
+                                                    <option></option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Site Internet</label>
+                                                <div class="">
+                                                    <input type="text" ng-model="org.site_internet" class="form-control"
+                                                        placeholder="www.monsiteinternet.com" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Email</label>
+                                                <input type="email" ng-model="org.email" class="form-control"
+                                                    placeholder="Enter email..."
+                                                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Tel</label>
+                                                <input type="text" ng-model="org.tel" class="form-control masked_tel"
+                                                    placeholder="0672 16 75 75" required />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Fax</label>
+                                                <input type="text" ng-model="org.fax" class="form-control masked_tel"
+                                                    placeholder="0672 16 75 75" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Rappel des RDVs automatique ?</label>
+                                                <input class="form-control" type="checkbox"
+                                                    ng-model="org.is_rappel_rdv_automatique">
+                                            </div>
+                                        </div>
+                                        <div ng-if="org.is_rappel_rdv_automatique" class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Envoi de rappel RDV Avant </label>
+                                                <input type="number" step="1" pattern="\d+"
+                                                    ng-model="org.reminder_delay" class="form-control"
+                                                    required />(Heures)
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row" style="width: 100%;">
+                                            <div class="col-sm-6">
+                                                <label style="margin-right: 5px;">Charger Logo</label>
+                                                <div class="">
+                                                    <div class="custom-file">
+                                                        <input id="logo_document" name="logo_document" type="file"
+                                                            file-model="logo_document" accept="image/*"
+                                                            class="custom-file-input" data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="Cliquer ici pour choisir la logo à charger">
+                                                        <label class="custom-file-label" for="logo_document">Charger
+                                                            logo</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6 text-center">
+
+                                                <img ng-src="{{org_logo_url}}" alt="Logo" class="brand-image col-6"
+                                                    style="opacity: .8;margin: 30px;">
+                                                <p>Logo actuel</p>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row" style="width: 100%;margin-top: 10px;">
+                                            <div class="col-sm-6">
+                                                <label style="margin-right: 5px;">Charger Arrière plan</label>
+                                                <div class="">
+                                                    <div class="custom-file">
+                                                        <input id="background_document" name="background_document"
+                                                            type="file" file-model="background_document"
+                                                            accept="image/*" class="custom-file-input"
+                                                            data-toggle="tooltip" data-placement="top"
+                                                            title="Cliquer ici pour choisir la background à charger">
+                                                        <label class="custom-file-label"
+                                                            for="background_document">Charger
+                                                            background</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6 text-center">
+
+                                                <img ng-src="{{org_background_url}}" alt="background"
+                                                    class="brand-image col-6" style="opacity: .8;margin: 30px;">
+                                                <p>Arrière plan actuel</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </br>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <button ng-if="permission_clinique.can_update" type="submit"
+                                                class="btn btn-success btn-block">Mettre à
+                                                jour les informations de ma clinique</button>
+                                            <img ng-if="vm.dataLoading"
+                                                src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div ng-if="license.F8 && permission_utilisateurs.can_read" class="tab-pane fade"
+                                id="tab_utilisateurs" role="tabpanel"
+                                ng-class="{'active' : vm.Selected_param === 'utilisateurs','show': vm.Selected_param === 'utilisateurs'}"
+                                aria-labelledby="tab_utilisateurs">
+                                <ng-container>
+                                    <!-- TABLES, FILTERING, AND PAGINATION -->
+                                    <div class="container rounded">
+                                        <input type="text" class="form-control my-3" placeholder="Filtre..."
+                                            ng-model="filterText">
+                                        <a class="btn btn-app" ng-click="vm.NoSelectedeUser()" data-toggle="modal"
+                                            data-target="#add_user_modal">
+                                            <i class="fas fa-plus"></i> Ajouter
+                                        </a>
+                                        <div class="table-responsive tableFixHead" vm.controlled>
+                                            <table id="userTable"
+                                                class="table table-striped table-bordered table-hover table-head-fixed text-nowrap"
+                                                data-pagination="true" data-side-pagination="server"
+                                                data-total-field="count" style="text-align: center;">
+                                                <thead>
+                                                    <tr>
+                                                        <th ng-repeat="label in labels">
+                                                            <a ng-click="vm.sortColumn(label)">
+                                                                <span class="text-uppercase">{{label}}</span>
+                                                                <span ng-if="orderByField == label">
+                                                                    <span ng-if="!sortByDescending">
+                                                                        <i class="fas fa-angle-up"></i>
+                                                                    </span>
+                                                                    <span ng-if="sortByDescending">
+                                                                        <i class="fas fa-angle-down"></i>
+                                                                    </span>
+                                                                </span>
+                                                            </a>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-click="vm.add2selection(utilisateur)"
+                                                        ng-repeat="utilisateur in filterData = (vm.allUsers | filter: filterText | orderBy : orderByField : sortByDescending) | limitTo:itemsPerPage:itemsPerPage*(currentPage-1)  track by $index"
+                                                        ng-class="{ 'text-white bg-primary': utilisateur == selected } ">
+                                                        <td>
+                                                            <div
+                                                                class="d-flex justify-content-center align-self-center custom-control custom-checkbox">
+                                                                <input id="customCheckbox2{{utilisateur.id}}"
+                                                                    ng-model="utilisateur.unselected"
+                                                                    class="custom-control-input" type="checkbox"
+                                                                    ng-click="vm.add2selection(utilisateur)">
+                                                                <label for="customCheckbox2{{utilisateur.id}}"
+                                                                    class="custom-control-label"></label>
+                                                            </div>
+                                                        </td>
+                                                        <td>{{utilisateur.profession}}</td>
+                                                        <td>{{utilisateur.fname}} {{utilisateur.lname}}</td>
+                                                        <td>{{utilisateur.email}}</td>
+                                                        <td>
+                                                            <div class="custom-control custom-switch"
+                                                                ng-class="{'custom-switch-off-success':utilisateur.active,'custom-switch-off-danger':!utilisateur.active }">
+                                                                <input type="checkbox" class="custom-control-input"
+                                                                    ng-checked="utilisateur.active">
+                                                                <label class="custom-control-label"></label>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <button ng-if="permission_utilisateurs.can_update"
+                                                                class="btn btn-success" data-toggle="modal"
+                                                                data-target="#edit_user_modal"
+                                                                ng-click="vm.SelectedeUser(utilisateur,$index)"
+                                                                title="Cliquez pour modifier" data-toggle="tooltip"><i
+                                                                    class="fas fa-edit"></i></button>
+                                                        </td>
+                                                        <td>
+                                                            <button ng-if="permission_utilisateurs.can_update"
+                                                                class="btn btn-success" data-toggle="modal"
+                                                                data-target="#user_access_modal"
+                                                                ng-click="vm.SelectedeUser(utilisateur,$index)"
+                                                                title="Cliquez pour modifier les priviléges"
+                                                                data-toggle="tooltip">
+                                                                <i class="fas fa-key"></i></button>
+                                                        </td>
+                                                        <td>
+                                                            <button ng-if="permission_utilisateurs.can_delete"
+                                                                class="btn btn-danger"
+                                                                ng-click="vm.deleteUser(utilisateur.id,utilisateur,$index)"
+                                                                title="Cliquez pour supprimer" data-toggle="tooltip"><i
+                                                                    class="fas fa-minus"></i></button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-4 col-md-4 col-lg-4">
+                                                {{selected_lignes}} Ligne(s) selectionnée(s)
+                                            </div>
+                                            <div class="col-sm-4 col-md-4 col-lg-4"></div>
+                                            <div class="col-sm-4 col-md-4 col-lg-4">
+                                                <div class="btn-group btn-group-toggle float-right"
+                                                    data-toggle="buttons">
+                                                    <label class="btn bg-primary active">
+                                                        <input type="radio" name="options" id="option1"
+                                                            ng-click="itemsPerPage=3" autocomplete="off"> 3
+                                                    </label>
+                                                    <label class="btn bg-primary">
+                                                        <input type="radio" name="options" id="option2"
+                                                            ng-click="itemsPerPage=5" autocomplete="off"> 5
+                                                    </label>
+                                                    <label class="btn bg-primary">
+                                                        <input type="radio" name="options" id="option3"
+                                                            ng-click="itemsPerPage=10" autocomplete="off" checked=""> 10
+                                                    </label>
+                                                    <label class="btn bg-primary">
+                                                        <input type="radio" name="options" id="option4"
+                                                            ng-click="itemsPerPage=20" autocomplete="off">
+                                                        20
+                                                    </label>
+                                                    <label class="btn bg-primary">
+                                                        <input type="radio" name="options" id="option5"
+                                                            ng-click="itemsPerPage=50" autocomplete="off">
+                                                        50
+                                                    </label>
+                                                    <label class="btn bg-primary">
+                                                        <input type="radio" name="options" id="option6"
+                                                            ng-click="itemsPerPage=100" autocomplete="off">
+                                                        100
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ul class="d-flex justify-content-center" uib-pagination previous-text='<<'
+                                            next-text='>>' total-items="filterData.length" items-per-page="itemsPerPage"
+                                            ng-model="currentPage" max-size="5" boundary-link-numbers="3"
+                                            ng-change="vm.pageChanged()"></ul>
+                                    </div>
+                                </ng-container>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.card -->
+        </div>
+    </section>
+</div>
+
+
+<!--*********************** Static Tables Modal ******************************-->
+<div ng-if="permission_static_tables.can_create" class="modal fade show" id="Static_Table_Modal"
+    style="display: none;  z-index: 10000000 !important;" aria-modal="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h4 class="modal-title">
+                    <i class="fas fa-bars"></i>
+                    Table : {{Selected_Static_Table_Name}}
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="card card-warning">
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <form role="form" id="Static_Table_Form" name="Static_Table_Form">
+                            <div class="row" style="width:100%">
+                                <div class="input-group col-10" rel="tooltip" title="Rechercher une demande de contrôle"
+                                    data-placement="bottom">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><svg class="bi bi-search" width="1em"
+                                                height="1em" viewBox="0 0 16 16" fill="currentColor"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd"
+                                                    d="M10.442 10.442a1 1 0 011.415 0l3.85 3.85a1 1 0 01-1.414 1.415l-3.85-3.85a1 1 0 010-1.415z"
+                                                    clip-rule="evenodd" />
+                                                <path fill-rule="evenodd"
+                                                    d="M6.5 12a5.5 5.5 0 100-11 5.5 5.5 0 000 11zM13 6.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
+                                                    clip-rule="evenodd" />
+                                            </svg></span>
+                                    </div>
+                                    <input type="text" class="form-control" placeholder="Filtre..."
+                                        ng-model="vm.Static_Table_Filtre">
+                                </div>
+                                <button class="btn btn-lg btn-warning col-2" ng-click="Add_New_Object2Static_Table()"
+                                    title="Cliquez pour Ajouter {{Selected_Static_Table_Name}}" data-toggle="tooltip"><i
+                                        class="fas fa-plus"></i></button>
+                            </div>
+
+                            <div class="box-body table-responsive no-padding" style="max-height: 300px;">
+                                <table class="table table-hover">
+                                    <tbody>
+                                        <thead>
+                                            <tr>
+                                                <th ng-repeat="label in Selected_Static_Table_Labels">
+                                                    <a>
+                                                        <span class="text-uppercase">{{label}}</span>
+                                                    </a>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tr style="cursor: pointer;"
+                                            ng-repeat="ligne in dataTable = (Selected_Static_Table_Array | filter: vm.Static_Table_Filtre) track by $index"
+                                            ng-click="Select_Row_Static_Table(Selected_Static_Table_Name,ligne,$index);"
+                                            ng-class="{ 'table-info': Static_Table_Selected_Row.id === ligne.id }">
+                                            <td>
+                                                {{ligne.id}}
+                                            </td>
+                                            <td>
+                                                <input class="form-control" type="text" name="Static_Table_Designation"
+                                                    ng-model="ligne.designation" minlength="2"
+                                                    placeholder="Entrer une designation ..." required />
+
+                                            </td>
+                                            <td ng-if="Selected_Static_Table_Name==='actes'">
+                                                <select class="form-control" ng-model="ligne.procedure_id">
+                                                    <option ng-repeat="item in procedures" ng-value="item.id">
+                                                        {{item.designation}}</option>
+                                                </select>
+                                            </td>
+                                            <td ng-if="Selected_Static_Table_Name==='actes'">
+                                                <input type="text" class="form-control masked_money" placeholder="0.00"
+                                                    ng-model="ligne.montant">
+                                            </td>
+                                            <td ng-if="Selected_Static_Table_Name==='types_transactions'">
+                                                <select class="form-control" ng-model="ligne.operation">
+                                                    <option ng-value="credit">Crédit (+)</option>
+                                                    <option ng-value="debit">Débit (-)</option>
+                                                </select>
+                                            </td>
+                                            <td ng-if="Selected_Static_Table_Name==='types_transactions'">
+                                                <select class="form-control" ng-model="ligne.cible">
+                                                    <option value="patient">Patient</option>
+                                                    <option value="partenaire">Partenaire</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <button ng-if="!ligne.id" class="btn btn-warning"
+                                                    ng-click="Add_Static_Table(Selected_Static_Table_Name,ligne,$index)"
+                                                    title="Cliquez pour enregistrer" data-toggle="tooltip"><i
+                                                        class="fas fa-save"></i>
+                                                </button>
+                                                <button ng-if="ligne.id" class="btn btn-success"
+                                                    ng-click="Edit_Static_Table(Selected_Static_Table_Name,ligne,$index)"
+                                                    title="Cliquez pour modifier" data-toggle="tooltip"><i
+                                                        class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger"
+                                                    ng-click="Delete_Static_Table(Selected_Static_Table_Name,ligne,$index)"
+                                                    title="Cliquez pour supprimer" data-toggle="tooltip"><i
+                                                        class="fas fa-minus"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer ">
+                        <button type="button" class="btn btn-lg btn-success " data-dismiss="modal">ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!---------------------------ADD USER Modals---------------------------------------->
+<div ng-if="permission_utilisateurs.can_create" class="modal fade show" id="add_user_modal" style="display: none;"
+    aria-modal="true">
+    <div ng-class="{ 'alert': flash, 'alert-success': flash.type === 'success', 'alert-danger': flash.type === 'error' }"
+        ng-if="flash" ng-bind="flash.message"></div>
+    <form name="form" ng-submit="vm.addUser(vm.Selectedutilisateur,$index)" role="form">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h4 class="modal-title">Ajouter un nouvel utilisateur</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card card-warning">
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                            <div class="row">
+
+                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label>Profession
+                                            <button type="button" class="close float-right"
+                                                style="color: green;font-size: 12px;"
+                                                ng-click="Upload_Static_Table_To_Modal('org_professions',org_professions)"
+                                                data-toggle="modal" data-target="#Static_Table_Modal" rel="tooltip"
+                                                title="Ajouter un nouveau type de radiogaphie" data-placement="bottom">
+                                                <span aria-hidden="true"><i class="fas fa-plus-circle"></i></span>
+                                            </button>
+                                        </label>
+                                        <select class="form-control" name="direction_add"
+                                            ng-options="org_prof.id as org_prof.designation for org_prof in org_professions"
+                                            ng-model="vm.Selectedutilisateur.org_profession_id" required>
+                                            <option></option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 form-group">
+                                    <label>Sexe</label>
+                                    <select class="form-control" style="width: auto; height: auto; padding: auto;"
+                                        ng-model="vm.Selectedutilisateur.gender" placeholder="Enter le sexe..."
+                                        required>
+                                        <option value=""></option>
+                                        <option ng-repeat="sexe in sexes" value="{{sexe.id}}">
+                                            {{sexe.designation}}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="row" style="width:100%">
+                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                        <!-- text input -->
+                                        <div class="form-group">
+                                            <label>Nom</label>
+                                            <input type="text" ng-model="vm.Selectedutilisateur.fname"
+                                                class="form-control" placeholder="Enter ..." name="nom_add" required>
+                                            <span style="color:red"
+                                                ng-if="form.nom_add.$dirty && form.nom_add.$error.required"
+                                                class="help-block">Attention : le nom est obligatoire</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                        <div class="form-group">
+                                            <label>Prénom</label>
+                                            <input type="text" ng-model="vm.Selectedutilisateur.lname"
+                                                class="form-control" placeholder="Enter ..." name="prenom_add" required>
+                                            <span style="color:red"
+                                                ng-if="form.prenom_add.$dirty && form.prenom_add.$error.required"
+                                                class="help-block">Attention : le prenom est obligatoire</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" style="width:100%">
+                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                        <div class="form-group"
+                                            ng-class="{ 'has-error': form.email.$dirty && form.email.$error.required }">
+                                            <label>Email</label>
+                                            <input type="email" class="form-control" placeholder="Email"
+                                                name="email_add" ng-model="vm.Selectedutilisateur.email"
+                                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required />
+                                            <span style="color:red"
+                                                ng-if="form.email_add.$dirty && form.email_add.$error.required"
+                                                class="help-block">Attention : l'email est obligatoire</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="input-group"
+                                        ng-class="{ 'has-error': form.password_profile.$dirty && form.password_profile.$error.required }">
+                                        <input type="password" name="password_profile" autocomplete="votre mot de passe"
+                                            placeholder="Mot de passe" id="password_profile" class="form-control"
+                                            ng-model="vm.Selectedutilisateur.password" minlength="5"
+                                            ng-change="vm.validatePassword()" required />
+                                        <div class="input-group-append">
+                                            <div class="input-group-text">
+                                                <span class="fas fa-lock"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="input-group"
+                                        ng-class="{ 'has-error': form.repassword_profile.$dirty && form.repassword_profile.$error.required }">
+                                        <input type="password" name="repassword_profile"
+                                            autocomplete="votre mot de passe" placeholder="retapez votre Mot de passe"
+                                            id="repassword_profile" class="form-control"
+                                            ng-model="vm.Selectedutilisateur.repassword"
+                                            ng-keyup="vm.validatePassword()" minlength="5" required />
+                                        <div class="input-group-append">
+                                            <div class="input-group-text">
+                                                <span class="fas fa-lock"></span>
+                                            </div>
+                                        </div>
+                                        <p ng-if="vm.Selectedutilisateur.password != vm.Selectedutilisateur.repassword"
+                                            style="color:red">
+                                            Les deux mots
+                                            de
+                                            passes
+                                            ne
+                                            sont pas
+                                            identiques</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-success"
+                        ng-disabled="form.$invalid || vm.Selectedutilisateur.password != vm.Selectedutilisateur.repassword">Enregistrer</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </form>
+</div>
+
+<!---------------------------EDIT USER  Modals---------------------------------------->
+<div ng-if="permission_utilisateurs.can_update" class="modal fade show" id="edit_user_modal" style="display: none;"
+    aria-modal="true">
+    <form role="form" ng-submit="vm.updateSelectedUser(vm.SelectedUser,$index)">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header bg-success">
+                    <h4 class="modal-title">Editer la fiche utilisateur : {{vm.SelectedUser.fname}}
+                        {{vm.SelectedUser.lname}}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card card-warning">
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                    <!-- select -->
+                                    <div class="form-group">
+                                        <label>Clinique</label>
+                                        <select class="form-control" name="org_edit"
+                                            ng-options="org.id as org.designation for org in orgs"
+                                            ng-model="vm.SelectedUser.org_id" disabled required>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label>Profession</label>
+                                        <select class="form-control" name="direction_edit"
+                                            ng-model="vm.SelectedUser.org_profession_id"
+                                            ng-options="org_prof.id as org_prof.designation for org_prof in org_professions"
+                                            required>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 form-group">
+                                    <label>Sexe</label>
+                                    <select class="form-control" style="width: auto; height: auto; padding: auto;"
+                                        ng-model="vm.SelectedUser.gender" placeholder="Enter le sexe..." required>
+                                        <option value=""></option>
+                                        <option ng-repeat="sexe in sexes" value="{{sexe.id}}">
+                                            {{sexe.designation}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="row" style="width: 100%;">
+                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                        <!-- text input -->
+                                        <div class="form-group">
+                                            <label>Nom</label>
+                                            <input type="text" ng-model="vm.SelectedUser.fname" class="form-control"
+                                                placeholder="Enter ..." name="nom_edit">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                        <div class="form-group">
+                                            <label>Prénom</label>
+                                            <input type="text" ng-model="vm.SelectedUser.lname" class="form-control"
+                                                placeholder="Enter ..." name="prenom_edit">
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row" style="width: 100%;">
+                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                        <div class="form-group"
+                                            ng-class="{ 'has-error': form.email_edit.$dirty && form.email_edit.$error.required }">
+                                            <label>Email</label>
+                                            <input type="email" class="form-control" placeholder="Email"
+                                                name="email_edit" ng-model="vm.SelectedUser.email"
+                                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" style="width: 100%;">
+
+                                    <div class="col-sm-4">
+                                        <div class="input-group"
+                                            ng-class="{ 'has-error': form_profile.password.$dirty && form_profile.password_profile.$error.required }">
+                                            <input type="password" name="password_profile"
+                                                autocomplete="votre mot de passe" placeholder="Mot de passe"
+                                                id="password_profile" class="form-control"
+                                                ng-model="vm.SelectedUser.password" minlength="5"
+                                                ng-change="vm.validatePassword()" required />
+                                            <div class="input-group-append">
+                                                <div class="input-group-text">
+                                                    <span class="fas fa-lock"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+
+                                        <div class="input-group"
+                                            ng-class="{ 'has-error': form_profile.repassword_profile.$dirty && form_profile.repassword_profile.$error.required }">
+                                            <input type="password" name="repassword_profile"
+                                                autocomplete="votre mot de passe"
+                                                placeholder="retapez votre Mot de passe" id="repassword_profile"
+                                                class="form-control" ng-model="vm.SelectedUser.repassword"
+                                                ng-keyup="vm.validatePassword()" minlength="5" required />
+                                            <div class="input-group-append">
+                                                <div class="input-group-text">
+                                                    <span class="fas fa-lock"></span>
+                                                </div>
+                                            </div>
+                                            <p ng-if="vm.SelectedUser.password != vm.SelectedUser.repassword"
+                                                style="color:red">Les deux mots
+                                                de passes ne sont pas identiques</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" style="width: 100%;margin-top: 10px;">
+                                    <button ng-if="!vm.SelectedUser.active" class="btn btn-lg btn-info"
+                                        ng-click="vm.SelectedUser.active = true" title="Cliquez pour activer"
+                                        data-toggle="tooltip"><i class="far fa-check-circle"></i> Activer ce
+                                        compte</button>
+
+                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                        <!-- checkbox -->
+                                        <div class="form-group">
+
+                                            <div ng-if="vm.SelectedUser.active" class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                    ng-model="vm.SelectedUser.active" name="active_edit">
+                                                <label class="form-check-label">Active ?</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+                        <button type="submit" class="btn btn-success">Enregistrer</button>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </form>
+</div>
+
+<!--------------------------- user_access_modal  Modals---------------------------------------->
+<div ng-if="permission_utilisateurs.can_update" class="modal fade show" id="user_access_modal" style="display: none;"
+    aria-modal="true">
+    <form role="form" ng-submit="vm.UpdateSelectedUserAccess(SelectedUserAccess_Control,$index)">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success">
+                    <h4 class="modal-title">Editer les privilèges de l'utilisateur : {{vm.SelectedUser.fname}}
+                        {{vm.SelectedUser.lname}}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card card-warning">
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                            <div class="row" style="width: 100%;">
+                                <ng-container style="width: 100%;">
+                                    <!-- mainTable -->
+                                    <div class="row" style="width : 100%">
+                                        <div class="input-group col-10" rel="tooltip" title="Rechercher un patient"
+                                            data-placement="bottom">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><svg class="bi bi-search" width="1em"
+                                                        height="1em" viewBox="0 0 16 16" fill="currentColor"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <path fill-rule="evenodd"
+                                                            d="M10.442 10.442a1 1 0 011.415 0l3.85 3.85a1 1 0 01-1.414 1.415l-3.85-3.85a1 1 0 010-1.415z"
+                                                            clip-rule="evenodd" />
+                                                        <path fill-rule="evenodd"
+                                                            d="M6.5 12a5.5 5.5 0 100-11 5.5 5.5 0 000 11zM13 6.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
+                                                            clip-rule="evenodd" />
+                                                    </svg></span>
+                                            </div>
+                                            <input type="text" class="form-control" placeholder="Filtre..."
+                                                ng-model="vm.filterTextMainTable" style="height: 100%;">
+                                        </div>
+
+                                        <div class="col-2">
+                                            <button class="btn btn-lg btn-warning" style="float: right;"
+                                                ng-click="vm.Refresh_User_Access_Array()"
+                                                title="Cliquez pour actualiser la table des user"
+                                                data-toggle="tooltip"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                    height="16" fill="currentColor" class="bi bi-arrow-clockwise"
+                                                    viewBox="0 0 16 16">
+                                                    <path fill-rule="evenodd"
+                                                        d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+                                                    <path
+                                                        d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="table-responsive tableFixHead p-0" vm.controlled rel="tooltip"
+                                        data-placement="top" title="Cliquez pour selectionner un patient">
+                                        <table id="User_AccessTable"
+                                            class="table table-striped table-bordered table-hover table-head-fixed text-nowrap"
+                                            data-pagination="true" data-side-pagination="server"
+                                            data-total-field="count" style="text-align: center;">
+                                            <thead>
+                                                <tr>
+                                                    <th ng-repeat="label in Labels_Table_Access">
+                                                        <a ng-click="vm.sortColumnMainTable(label)">
+                                                            <span class="text-uppercase">{{label}}</span>
+                                                            <span ng-if="orderByFielduserTable == label">
+                                                                <span ng-if="!sortByDescendingMainTable">
+                                                                    <i class="fa fa-angle-up"></i>
+                                                                </span>
+                                                                <span ng-if="sortByDescendingMainTable">
+                                                                    <i class="fa fa-angle-down"></i>
+                                                                </span>
+                                                            </span>
+                                                        </a>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr
+                                                    ng-repeat="User_Access in dataMainTable = (SelectedUserAccess_Control | filter: vm.filterTextMainTable) track by $index">
+                                                    <td>{{User_Access.id}}</td>
+                                                    <td>{{User_Access.table_name}}</td>
+                                                    <td>
+                                                        <input type="checkbox" ng-model="User_Access.can_read">
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" ng-model="User_Access.can_create">
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" ng-model="User_Access.can_update">
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" ng-model="User_Access.can_delete">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                    <div class="row" style="width: 100%;">
+                                        <div class="col-sm-4 col-md-4 col-lg-4">
+                                            <p style="font-size: larger;">Total : {{dataMainTable.length}}</p>
+                                        </div>
+                                        <div class="col-sm-4 col-md-4 col-lg-4"></div>
+                                        <div class="col-sm-4 col-md-4 col-lg-4">
+                                            <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+                                                <label class="btn btn-outline-dark ">
+                                                    <input type="radio" name="optionsMainTable" id="option1MainTable"
+                                                        ng-click="itemsPerPageMainTable=3" autocomplete="off"> 3
+                                                </label>
+                                                <label class="btn btn-outline-dark">
+                                                    <input type="radio" name="optionsMainTable" id="option2MainTable"
+                                                        ng-click="itemsPerPageMainTable=5" autocomplete="off"> 5
+                                                </label>
+                                                <label class="btn btn-outline-dark active">
+                                                    <input type="radio" name="optionsMainTable" id="option3MainTable"
+                                                        ng-click="itemsPerPageMainTable=10" autocomplete="off"
+                                                        checked=""> 10
+                                                </label>
+                                                <label class="btn btn-outline-dark">
+                                                    <input type="radio" name="optionsMainTable" id="option4MainTable"
+                                                        ng-click="itemsPerPageMainTable=20" autocomplete="off">
+                                                    20
+                                                </label>
+                                                <label class="btn btn-outline-dark">
+                                                    <input type="radio" name="optionsMainTable" id="option5MainTable"
+                                                        ng-click="itemsPerPageMainTable=50" autocomplete="off">
+                                                    50
+                                                </label>
+                                                <label class="btn btn-outline-dark">
+                                                    <input type="radio" name="optionsMainTable" id="option6MainTable"
+                                                        ng-click="itemsPerPageMainTable=100" autocomplete="off">
+                                                    100
+                                                </label>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <ul class="d-flex justify-content-center" uib-pagination previous-text='<<' next-text='>>'
+                                    total-items="dataMainTable.length" items-per-page="itemsPerPageMainTable" ng-model="currentPageMainTable"
+                                    max- boundary-link-numbers="3" ng-change="vm.pageChangedMainTable()"></ul>
+                                  -->
+
+                                    <ul id="User_AccessTablePagination"
+                                        class="pagination pg-red float-center d-flex justify-content-center"
+                                        total-items="dataMainTable.length" ng-model="currentPageMainTable"
+                                        max-size="maxSizePageMainTable" boundary-links="true" rotate="false"
+                                        num-pages="numPages" items-per-page="itemsPerPageMainTable" uib-pagination
+                                        first-text='<<<' previous-text='<<' next-text='>>' last-text='>>>'></ul>
+
+                                </ng-container>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+                        <button type="submit" class="btn btn-success">Enregistrer</button>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </form>
+</div>

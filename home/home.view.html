@@ -1,0 +1,78 @@
+<div ng-if="logged && user" class="content-wrapper">
+
+  <!-- Start Main Body Section -->
+  <div class="mainbody-section text-center">
+    <div class="container">
+      <div class="row" style="width: 100%;margin: auto;">
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3" style="margin: auto;">
+
+          <div  class="menu-item blue" rel="tooltip" data-placement="left" title="Gestion des patients">
+            <a ng-click="active_menu = 'patients'" href="#!patients" class="nav-link"
+              ng-class="{'active': active_menu==='patients'}">
+              <img src="../app-content/img/patient.png" alt="Patients">
+              <p>Patients</p>
+            </a>
+          </div>
+
+          <div ng-if="license.F2"class="menu-item green" rel="tooltip" data-placement="left" title="Gestion de la salle d'attente">
+            <a ng-click="active_menu = 'salle_attente'" href="#!salle_attente" class="nav-link"
+              ng-class="{'active': active_menu==='salle_attente'}">
+              <img src="../app-content/img/salle_attente.png" alt="Salle d'attente">
+              <p>Salle d'attente</p>
+            </a>
+          </div>
+
+          <div ng-if="license.F3" class="menu-item purple" rel="tooltip" data-placement="left" title="Gestion des recettes/dépenses">
+            <a ng-click="active_menu = 'caisse'" href="#!caisse" class="nav-link"
+              ng-class="{'active': active_menu==='caisse'}">
+              <img src="../app-content/img/comptabilite.png" alt="caisse">
+              <p>Caisse</p>
+            </a>
+          </div>
+
+        </div>
+
+        <div class="col-md-6" style="margin: auto;">
+
+          <img id="principal_background" src="../app-content/img/cabinet.png" alt="Cabinet Dentaire"
+            style="opacity: 90%;width : 90%">
+
+
+
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3" style="margin: auto;">
+
+          <div ng-if="license.F2" class="menu-item light-red" rel="tooltip" data-placement="right" title="Gestion des RDVs">
+            <a ng-click="active_menu = 'calendrier'" href="#!calendrier" class="nav-link"
+              ng-class="{'active': active_menu==='calendrier'}">
+              <img src="../app-content/img/calendrier.png" alt="Calendrier">
+              <p>Calendrier</p>
+            </a>
+          </div>
+
+          <div ng-if="license.F4" class="menu-item color" rel="tooltip" data-placement="right"
+            title="Afficher les rapports et statistiques">
+            <a ng-click="active_menu = 'reports'" href="#!reports" class="nav-link"
+              ng-class="{'active': active_menu==='reports'}">
+              <img src="../app-content/img/report.png" alt="Rapports">
+              <p>Statistiques</p>
+            </a>
+          </div>
+
+          <div class="menu-item turque" rel="tooltip" data-placement="right" title="Paramêtres générales">
+            <a ng-click="active_menu = 'parametres'" href="#!parametres" class="nav-link"
+              ng-class="{'active': active_menu==='parametres'}">
+              <img src="../app-content/img/clinic.png" alt="Clinique">
+              <p>Configurations</p>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Main Body Section -->
+
+</div>

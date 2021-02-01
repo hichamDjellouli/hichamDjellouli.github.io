@@ -1,0 +1,45 @@
+
+/** Paper sizes **/
+.A3           .sheet { width: 297mm; height: 419mm }
+.A3.landscape .sheet { width: 420mm; height: 296mm }
+.A4           .sheet { width: 210mm; height: 296mm }
+.A4.landscape .sheet { width: 297mm; height: 209mm }
+.A5           .sheet { width: 148mm; height: 209mm }
+.A5.landscape .sheet { width: 210mm; height: 147mm }
+
+/** Padding area **/
+.sheet.padding-10mm { padding: 10mm }
+.sheet.padding-15mm { padding: 15mm }
+.sheet.padding-20mm { padding: 20mm }
+.sheet.padding-25mm { padding: 25mm }
+
+/** For screen preview **/
+@media screen {
+  .sheet {
+    box-shadow: 0 .5mm 2mm rgba(0,0,0,.3);
+    margin: auto;
+  }
+}
+
+/** Fix for Chrome issue #273306 **/
+@media print {        
+  .A3.landscape { width: 420mm;margin: auto; }
+  .A3, .A4.landscape { width: 297mm;margin: auto; }
+  .A4, .A5.landscape { width: 210mm;margin: auto; }
+  .A5                    { width: 148mm;margin: auto; }
+  @page {
+    size: A5;
+   /* margin: 30mm 45mm 30mm 45mm; 
+      change the margins as you want them to be. */
+    margin: auto; 
+     text-align: center;
+     width: auto; 
+     border: 0; 
+    margin: auto;
+     padding: 0; 
+     float: none !important; 
+  }
+  .hidden-print {
+    display: none !important;
+  }
+}

@@ -1,0 +1,185 @@
+<!-- Content Wrapper. Contains page content -->
+<div ng-if="logged && user" class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2" style="margin-bottom: -0.5rem!important; ">
+        <div class="col-sm-6" style="margin: auto;">
+          <h1 class="m-0 text-dark">Annuaire des collaborateurs</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#!/">Acceuil</a></li>
+            <li class="breadcrumb-item active">Annuaire</li>
+          </ol>
+        </div><!-- /.col -->
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+  <!-- /.content-header -->
+
+  <!-- Main content -->
+  <section ng-if="permission_annuaire.can_read" class="content">
+    <div class="container-fluid">
+      <div class="card-body pb-0">
+        <div class="row" style="width : 100%;">
+          <div class="input-group col-10" rel="tooltip" title="" data-placement="bottom"
+            data-original-title="Rechercher un patient">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><svg class="bi bi-search" width="1em" height="1em" viewBox="0 0 16 16"
+                  fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd"
+                    d="M10.442 10.442a1 1 0 011.415 0l3.85 3.85a1 1 0 01-1.414 1.415l-3.85-3.85a1 1 0 010-1.415z"
+                    clip-rule="evenodd"></path>
+                  <path fill-rule="evenodd"
+                    d="M6.5 12a5.5 5.5 0 100-11 5.5 5.5 0 000 11zM13 6.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
+                    clip-rule="evenodd"></path>
+                </svg></span>
+            </div>
+            <input type="text" class="form-control ng-pristine ng-untouched ng-valid ng-empty"
+              placeholder="Chercher un partenaire..." ng-model="vm.FilterPartenaire"
+              style="height: 100%;border: aliceblue;">
+            <span style="padding:10px;margin:auto;color:rgba(0, 183, 255, 0.781)"> Trouvé(s) :
+              {{All_Partenaires_Filtred.length}}</span>
+          </div>
+
+          <div class="col-2">
+            <a ng-if="permission_annuaire.can_create" class="btn btn-lg btn-warning" data-toggle="modal" data-target="#Add_Partenaire_Modal" rel="tooltip"
+              title="Ajouter un nouveau patient" data-placement="bottom">
+              <i class="fas fa-user-plus" style="color:#1c8ec4"></i>
+            </a>
+            <a class="btn btn-lg btn-warning" ng-click="vm.Get_All_Partenaires()" rel="tooltip"
+              title="Cliquez pour actualiser la liste des partenaires" data-placement="bottom">
+              <i class="fas fa-refresh" style="color:#1c8ec4"></i>
+            </a>
+          </div>
+        </div>
+        <br>
+        <div class="row d-flex align-items-stretch" style="width: 100%;">
+          <div
+            ng-repeat="partenaire in All_Partenaires_Filtred =  (vm.All_Partenaires | filter: vm.FilterPartenaire  | orderBy:'designation')  track by $index"
+            class="col-sm-4 col-md-4 col-lg-4 d-flex align-items-stretch">
+            <div class="card bg-light" style="width: 400px;white-space: normal;">
+              <button type="button" ng-click="vm.Delete_Partenaire(partenaire.id)" class="close_right"
+                style="margin-left: 95%;">
+                <span aria-hidden="true">×</span>
+              </button>
+              <div class="card-header text-muted border-bottom-0" style="width: 400px;white-space: normal;">
+              <h3 data-letters="{{partenaire.designation.charAt(0)}}" style="color: {{partenaire.color}}">{{partenaire.designation}}</h3>
+              </div>
+              <div class="card-body pt-0" style="width: 400px;white-space: normal;">
+                <ul class="col-12 fa-ul text-muted">
+                  <b>
+                    <li class="small"><span class="fa-li"><i class="fas fa-map-marker-alt"></i></span> Address:
+                  </b>
+                  {{partenaire.adresse}}</li>
+                  <b>
+                    <li class="small"><span class="fa-li"><i class="far fa-envelope"></i></span> Email:
+                  </b>
+                  {{partenaire.email}}</li>
+                  <b>
+                    <li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span> Tel:
+                  </b>
+                  {{partenaire.tel}}</li>
+                  <b>
+                    <li class="small"><span class="fa-li"> <i class="fa fa-fax"></i></span> Fax:
+                  </b> {{partenaire.fax}}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+
+<!-- Control Sidebar -->
+<aside ng-if="logged && user" class="control-sidebar control-sidebar-dark">
+  <!-- Control sidebar content goes here -->
+</aside>
+<!-- /.control-sidebar -->
+
+<!---------------------------ADD PartenaireModals---------------------------------------->
+<div ng-if="permission_annuaire.can_create" class="modal fade show" id="Add_Partenaire_Modal" style="display: none;" aria-modal="true">
+
+  <form name="Add_Partenaire_Form" ng-submit="vm.Add_Partenaire(vm.New_Partenaire,$index)" role="form">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-danger">
+          <h4 class="modal-title">Ajouter un nouveau partenaire</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="card card-warning">
+            <!-- /.card-header -->
+            <div class="card-body">
+              <form role="form">
+
+                <div class="row">
+                  <div class="col-sm-6">
+                    <!-- text input -->
+                    <div class="form-group">
+                      <label>Désignation</label>
+                      <input type="text" ng-model="vm.New_Partenaire.designation" class="form-control"
+                        placeholder="Enter ..." name="nom_add" required>
+                      <span style="color:red" ng-if="form.nom_add.$dirty && form.nom_add.$error.required"
+                        class="help-block">Attention : la designation est obligatoire</span>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label>Adresse</label>
+                      <input type="text" ng-model="vm.New_Partenaire.adresse" class="form-control"
+                        placeholder="Enter ..." name="prenom_add" >
+                      <span style="color:red" ng-if="form.prenom_add.$dirty && form.prenom_add.$error.required"
+                        class="help-block">Attention : l'adresse est obligatoire</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <div class="form-group" ng-class="{ 'has-error': form.email.$dirty && form.email.$error.required }">
+                      <label>Email</label>
+                      <input type="email" class="form-control" placeholder="Email" name="email_add"
+                        ng-model="vm.New_Partenaire.email"  />
+                      <span style="color:red" ng-if="form.email_add.$dirty && form.email_add.$error.required"
+                        class="help-block">Attention : l'email est obligatoire</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label>Tel</label>
+                      <input type="text" ng-model="vm.New_Partenaire.tel" class="form-control masked_tel"
+                        placeholder="0672 16 75 75"  />
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label>Fax</label>
+                      <input type="text" ng-model="vm.New_Partenaire.fax" class="form-control masked_tel"
+                        placeholder="023 16 75 75"  />
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <!-- /.card-body -->
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+          <button type="submit" class="btn btn-success" ng-disabled="form.$invalid">Enregistrer</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </form>
+</div>

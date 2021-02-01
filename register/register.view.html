@@ -1,0 +1,162 @@
+<div class="hold-transition" style="    align-items: center;
+display: -ms-flexbox;
+display: flex;
+-ms-flex-direction: column;
+flex-direction: column;
+padding: 10px;
+-ms-flex-pack: center;
+justify-content: center;
+
+">
+
+    <div class="register-box">
+        <div class="register-logo">
+            <h2 style="color: aliceblue;">S'enregistrer</h2>
+            <div id="register" style="font-size: 14px;"></div>
+
+        </div>
+        <!-- /.register-logo -->
+        <div class="card">
+            <a href="#!/login" class="text-center" style="font-size: 14px;">
+                <img class="brand-image " alt="Dzental" style="max-width: 265px;margin: auto;vertical-align: middle;"
+                    src="/app-content/img/Dzental_logo.png">
+            </a>
+            <div class="card-body register-card-body">
+                <div ng-if="!testhttpOK" class="alert-danger">Votre connexion au serveur a été interrompue</div>
+
+                <div ng-class="{ 'alert': flash, 'alert-success': flash.type === 'success', 'alert-danger': flash.type === 'error' }"
+                    ng-if="flash" ng-bind="flash.message"></div>
+                <hr>
+                <form name="form_register" ng-submit="vm.register(form_register.$valid)" role="form">
+                    <!--
+                        <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Organisme</label>
+                                <select class="form-control" name="organisme_register" ng-model="vm.user.org_id"
+                                    ng-options="org.id as org.designation for org in orgs" required>
+                                    <option></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Direction</label>
+                                <select class="form-control" name="direction_register"
+                                    ng-model="vm.user.org_directions_id"
+                                    ng-options="org_dir.id as org_dir.designation for org_dir in org_directions"
+                                    required>
+                                    <option></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Wilayas</label>
+                                <select class="form-control" name="wilaya_register" ng-model="vm.user.wilaya_id"
+                                    ng-options="wilaya.id as wilaya.designation for wilaya in wilayas" required>
+                                    <option></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                -->
+
+
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <!-- text input -->
+                            <div class="form-group">
+                                <label>Nom</label>
+                                <input type="text" ng-model="vm.user.fname" class="form-control" placeholder="Enter ..."
+                                    name="nom_register" required>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Prénom</label>
+                                <input type="text" ng-model="vm.user.lname" class="form-control" placeholder="Enter ..."
+                                    name="prenom_register" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6 form-group">
+                            <label>Email</label>
+                            <div class="input-group "
+                                ng-class="{ 'has-error': form_register.email_register.$dirty && form_register.email_register.$error.required }">
+                                <input type="email" class="form-control" placeholder="Email" name="email_register"
+                                    id="email_register" ng-model="vm.user.email"
+                                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required />
+                                <div class="input-group-append">
+                                    <div class="input-group-text">
+                                        <span class="fas fa-envelope"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 form-group">
+                            <label>Mot de passe</label>
+                            <div class="input-group"
+                                ng-class="{ 'has-error': form_register.password.$dirty && form_register.password_register.$error.required }">
+                                <input type="password" name="password_register" autocomplete="votre mot de passe"
+                                    placeholder="Mot de passe" id="password_register" class="form-control"
+                                    ng-model="vm.user.password" minlength="5" ng-change="vm.validatePassword()"
+                                    required />
+                                <div class="input-group-append">
+                                    <div class="input-group-text">
+                                        <span class="fas fa-lock"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 form-group">
+                            <label>Retaper le Mot de passe</label>
+                            <div class="input-group"
+                                ng-class="{ 'has-error': form_register.repassword_register.$dirty && form_register.repassword_register.$error.required }">
+                                <input type="password" name="repassword_register"
+                                    placeholder="retapez votre Mot de passe" id="repassword_register"
+                                    class="form-control" ng-model="vm.user.repassword" ng-keyup="vm.validatePassword()"
+                                    minlength="5" required />
+                                <div class="input-group-append">
+                                    <div class="input-group-text">
+                                        <span class="fas fa-lock"></span>
+                                    </div>
+                                </div>
+                                <p ng-if="vm.user.password != vm.user.repassword" style="color:red">Les deux mots de
+                                    passes
+                                    ne
+                                    sont pas
+                                    identiques</p>
+                            </div>
+                        </div>
+
+                    </div>
+                    </br>
+                    <div class="row">
+
+                        <div class='btn-finish btn-fill pull-right' style="margin: auto;" vc-recaptcha theme="'dark '"
+                            size="'normal'" type="'image'" lang="fr" key="vm.model.key"
+                            on-create="vm.setWidgetId(widgetId)" on-success="vm.setResponse(response)"
+                            on-expire="vm.cbExpiration()"></div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-success btn-block">S'enregistrer</button>
+                            <img ng-if="vm.dataLoading"
+                                src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                </form>
+
+            </div>
+            <!-- /.register-card-body -->
+        </div>
+    </div>
+    <!-- /.register-box -->
+</div>
